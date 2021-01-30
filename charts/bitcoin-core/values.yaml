@@ -1,0 +1,25 @@
+#nameOverride: my-dummy-resource
+
+replicaCount: 1
+
+image:
+  name: "yourBitcoinCoreImage"
+  tag: "yourTag"
+  pullPolicy: Always
+
+service:
+  #nameOverride: "dummy-service"
+  type: "ClusterIP" # can also be set to "None" for headless services
+  ports: 
+    - port: 8332
+      targetPort: 8332
+      protocol: TCP
+      name: rpc-mainnet
+    - port: 8333
+      targetPort: 8333
+      protocol: TCP
+      name: public-mainnet
+    - port: 29000          
+      targetPort: 29000 
+      protocol: TCP      
+      name: zmq   

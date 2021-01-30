@@ -1,4 +1,24 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  name: {{ include "bitcoin-core.name" . }}
+  labels:
+    {{- include "bitcoin-core.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "bitcoin-core.selectorLabels" . | nindent 6 }}
+
+  serviceName: {{ include "bitcoin-core.serviceName" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "bitcoin-core.selectorLabels" . | nindent 8 }}
+  
+    spec:
+      containers:
+        - name: {{ include "bitcoin-core.name" . }}
+          image: {{ include "bitcoin-core.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}

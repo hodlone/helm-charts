@@ -1,15 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "bitcoin-core.fullname" . }}
+  name: {{ include "bitcoin-core.serviceName" . }}
   labels:
     {{- include "bitcoin-core.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
     {{- include "bitcoin-core.selectorLabels" . | nindent 4 }}
+
+  type: {{ .Values.service.type }}
+
+  ports:
+    {{- range $.Values.service.ports }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: {{ .protocol | quote }}
+      name: {{ .name | quote }}
+    {{- end }}
+
