@@ -1,0 +1,7 @@
+apiVersion: v2
+name: bitcoin-core-lnd
+description: An Umbrella Helm chart for bitcoin-core and lnd (lightning network client)
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+author: Rick & Ron
