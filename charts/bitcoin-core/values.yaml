@@ -3,13 +3,14 @@
 replicaCount: 1
 
 image:
-  name: ruimarinho/bitcoin-core
+  name: "ruimarinho/bitcoin-core"
   tag: latest
   pullPolicy: Always
 
 service:
   #nameOverride: "dummy-service"
-  type: "ClusterIP" # can also be set to "None" for headless services
+  type: "ClusterIP" 
+  clusterIp: "None" # can be set to "None" for headless services
   ports: 
     - port: 8332
       targetPort: 8332
@@ -23,3 +24,20 @@ service:
       targetPort: 29000 
       protocol: TCP      
       name: zmq   
+
+
+dataPersistency:
+  enabled: true
+  testMode: true # uses a different persistent volume for test purposes
+  storageClass: "bitcoin-data"
+  volumeMode: "Filesystem"
+  capacity: "100Gi"
+  accessModes: 
+    - ReadWriteOnce
+  diskMountPath: "/home/ubuntu/.bitcoin"
+  persistentVolumeReclaimPolicy: "Retain"
+  nodeSelector:
+    key: "kubernetes.io/hostname"
+    operator: In
+    value: "example-node"
+

@@ -1,0 +1,29 @@
+{{- if and .Values.dataPersistency.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "bitcoin-core.persistenVolumeName" . }}
+spec:
+  storageClassName: {{ .Values.dataPersistency.storageClass }}
+  volumeMode: {{ .Values.dataPersistency.volumeMode }}
+  capacity:
+    storage: {{ .Values.dataPersistency.capacity }}
+  persistentVolumeReclaimPolicy: {{ .Values.dataPersistency.persistentVolumeReclaimPolicy }}
+  accessModes:
+    {{- range $.Values.dataPersistency.accessModes }}
+    - {{ . }}
+    {{- end }}
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ include "bitcoin-core.persistenVolumeName" . }}
+  local:
+    path: {{ .Values.dataPersistency.diskMountPath }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: {{ .Values.dataPersistency.nodeSelector.key }}
+          operator: {{ .Values.dataPersistency.nodeSelector.operator }}
+          values:
+          - {{ .Values.dataPersistency.nodeSelector.value }}
+{{- end }}

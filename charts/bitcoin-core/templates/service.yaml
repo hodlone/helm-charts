@@ -9,7 +9,7 @@ spec:
     {{- include "bitcoin-core.selectorLabels" . | nindent 4 }}
 
   type: {{ .Values.service.type }}
-
+  clusterIP: {{ .Values.service.clusterIp }}
   ports:
     {{- range $.Values.service.ports }}
     - port: {{ .port }}

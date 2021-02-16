@@ -3,6 +3,11 @@
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/* ########### Chart ########### */}}
+{{- define "bitcoin-core.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{/* ########### Service Name ########### */}}
 {{- define "bitcoin-core.serviceName" -}}
 {{- default .Chart.Name .Values.service.nameOverride | trunc 63 | trimSuffix "-" -}}
@@ -30,5 +35,14 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 "{{ .Values.image.name }}@{{ .Values.image.tag }}"
 {{- else -}}
 "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+{{- end -}}
+{{- end -}}
+
+{{/* ########### Create the full name for the persistent volume ########### */}}
+{{- define "bitcoin-core.persistenVolumeName" -}}
+{{- if .Values.dataPersistency.testMode -}}
+"{{ include "bitcoin-core.name" . }}-data-test"
+{{- else -}}
+"{{ include "bitcoin-core.name" . }}-data"
 {{- end -}}
 {{- end -}}
