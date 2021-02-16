@@ -3,8 +3,8 @@
 replicaCount: 1
 
 image:
-  name: "yourBitcoinCoreImage"
-  tag: "yourTag"
+  name: ruimarinho/bitcoin-core
+  tag: latest
   pullPolicy: Always
 
 service:
