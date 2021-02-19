@@ -96,7 +96,7 @@ resources:
 # when the node receives SIGINT directive from kubernetes, it initiates a propper 
 # shutdown process that takes time... 300 seconds seems to be enough time. 
 terminationGracePeriodSeconds: 300
-probesEnabled: true
+probesEnabled: false
 livenessProbe:
   exec:
     command:
