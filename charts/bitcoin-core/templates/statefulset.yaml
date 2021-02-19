@@ -18,7 +18,56 @@ spec:
         {{- include "bitcoin-core.selectorLabels" . | nindent 8 }}
   
     spec:
+      # this is really important to prevent kubernetes killing the node unexpectedly
+      # in situations where the standard 30 seconds are not enough for the process to
+      # shutdown gracefully
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 600 }}
+
+      # necessary for preventing the scheduling of pods in nodes that dont have enough storage         
+    {{- if .Values.nodeSelectorEnabled }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+
       containers:
         - name: {{ include "bitcoin-core.name" . }}
           image: {{ include "bitcoin-core.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+        # to override the command (to override options for example)
+        {{- if .Values.command.enabled }}
+          command: {{ .Values.command.cmd }}
+          args: {{ .Values.command.args }}
+        {{- end }}
+
+        # the security context
+        {{- if .Values.securityContext.enabled }}
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+        {{- end }}
+
+        # liveness and readiness probes
+        {{- if .Values.probesEnabled }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+        {{- end }}
+
+        # External disk mounted to the container
+        {{- if and .Values.dataPersistency.enabled }}
+          volumeMounts:
+            - mountPath: {{ .Values.dataPersistency.mountPath }}
+              name: {{ include "bitcoin-core.persistenVolumeName" . }}  
+        {{- end }}
+    
+    {{- if .Values.dataPersistency.enabled }}
+      volumes:
+        - name: {{ include "bitcoin-core.persistenVolumeName" . }}
+          persistentVolumeClaim:
+            claimName: {{ include "bitcoin-core.persistenVolumeName" . }}
+    {{- end }}

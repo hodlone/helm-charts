@@ -1,12 +1,43 @@
-#nameOverride: my-dummy-resource
-
+###################################################################################
+##################################### REPLICAS ####################################
+###################################################################################
 replicaCount: 1
 
+###################################################################################
+####################################### IMAGE #####################################
+###################################################################################
 image:
   name: "ruimarinho/bitcoin-core"
   tag: latest
   pullPolicy: Always
 
+###################################################################################
+################################# CONTAINER PORTS #################################
+###################################################################################
+containerPorts:
+  - containerPort: 8332
+    protocol: TCP
+    name: rpc-mainnet
+  - containerPort: 8333
+    protocol: TCP
+    name: public-mainnet
+  # - containerPort: 18332
+  #   protocol: TCP
+  #   name: rpc-testnet
+  # - containerPort: 18333
+  #   protocol: TCP
+  #   name: public-testnet 
+  # - containerPort: 18444
+  #   protocol: TCP
+  #   name: p2p
+  ## Enable ZeroMQ interface 
+  # - containerPort: 29000
+  #   protocol: TCP
+  #   name: zmq
+
+###################################################################################
+##################################### SERVICE #####################################
+###################################################################################
 service:
   #nameOverride: "dummy-service"
   type: "ClusterIP" 
@@ -25,19 +56,90 @@ service:
       protocol: TCP      
       name: zmq   
 
+###################################################################################
+################################## NODE SELECTOR ##################################
+###################################################################################
+nodeSelectorEnabled: false
+nodeSelector:
+  preemptible: "false"
 
+###################################################################################
+################################# SECURITY CONTEXT ################################
+###################################################################################
+securityContext:
+  enabled: false
+  runAsUser: 100
+  allowPrivilegeEscalation: false
+
+###################################################################################
+###################################### COMMAND ####################################
+###################################################################################
+command: 
+  enabled: false
+  cmd: ["bitcoind"]
+
+###################################################################################
+##################################### RESOURCES ###################################
+###################################################################################
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "0.2"
+  limits:
+    memory: "2Gi"
+    cpu: "0.4"
+
+###################################################################################
+##################################### PROBES ######################################
+###################################################################################
+# use a generous grace period to avoid long resyncs (rolling forward) at restart
+# when the node receives SIGINT directive from kubernetes, it initiates a propper 
+# shutdown process that takes time... 300 seconds seems to be enough time. 
+terminationGracePeriodSeconds: 300
+probesEnabled: true
+livenessProbe:
+  exec:
+    command:
+      - bitcoin-cli
+      - getblockcount
+  # use generous initial delay. if the node was NOT propperly shutdown before, 
+  # the resync (rolling forward) will last for several hours before it is complete...
+  # during this time, all CLI commands will fail and kubernetes will kill the pod 
+  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+  initialDelaySeconds: 300 
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+readinessProbe:
+  exec:
+    command:
+      - bitcoin-cli
+      - getblockcount
+  # use generous initial delay. if the node was NOT propperly shutdown before, 
+  # the resync (rolling forward) will last for several hours before it is complete...
+  # during this time, all CLI commands will fail and kubernetes will kill the pod 
+  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+  initialDelaySeconds: 300
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+
+###################################################################################
+################################ DATA PERSISTENCY #################################
+###################################################################################
 dataPersistency:
   enabled: true
-  testMode: true # uses a different persistent volume for test purposes
-  storageClass: "bitcoin-data"
+  testMode: false # uses a different persistent volume for test purposes
+  storageClass: bitcoin-core-data
   volumeMode: "Filesystem"
-  capacity: "100Gi"
+  mountPath: /home/bitcoin/.bitcoin
+  capacity: "950Gi"
   accessModes: 
     - ReadWriteOnce
-  diskMountPath: "/home/ubuntu/.bitcoin"
-  persistentVolumeReclaimPolicy: "Retain"
-  nodeSelector:
-    key: "kubernetes.io/hostname"
-    operator: In
-    value: "example-node"
+  diskMountPath: /mnt/bitcoin-data
+  persistentVolumeReclaimPolicy: Delete
 

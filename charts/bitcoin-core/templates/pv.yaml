@@ -13,17 +13,6 @@ spec:
     {{- range $.Values.dataPersistency.accessModes }}
     - {{ . }}
     {{- end }}
-  claimRef:
-    namespace: {{ .Release.Namespace }}
-    name: {{ include "bitcoin-core.persistenVolumeName" . }}
-  local:
+  hostPath:
     path: {{ .Values.dataPersistency.diskMountPath }}
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: {{ .Values.dataPersistency.nodeSelector.key }}
-          operator: {{ .Values.dataPersistency.nodeSelector.operator }}
-          values:
-          - {{ .Values.dataPersistency.nodeSelector.value }}
 {{- end }}
