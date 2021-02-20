@@ -12,30 +12,6 @@ image:
   pullPolicy: Always
 
 ###################################################################################
-################################# CONTAINER PORTS #################################
-###################################################################################
-containerPorts:
-  - containerPort: 8332
-    protocol: TCP
-    name: rpc-mainnet
-  - containerPort: 8333
-    protocol: TCP
-    name: public-mainnet
-  # - containerPort: 18332
-  #   protocol: TCP
-  #   name: rpc-testnet
-  # - containerPort: 18333
-  #   protocol: TCP
-  #   name: public-testnet 
-  # - containerPort: 18444
-  #   protocol: TCP
-  #   name: p2p
-  ## Enable ZeroMQ interface 
-  # - containerPort: 29000
-  #   protocol: TCP
-  #   name: zmq
-
-###################################################################################
 ##################################### SERVICE #####################################
 ###################################################################################
 service:
@@ -76,7 +52,9 @@ securityContext:
 ###################################################################################
 command: 
   enabled: false
-  cmd: ["bitcoind"]
+  args: [
+    "-maxconnections=10",
+    ]
 
 ###################################################################################
 ##################################### RESOURCES ###################################

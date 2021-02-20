@@ -38,8 +38,10 @@ spec:
 
         # to override the command (to override options for example)
         {{- if .Values.command.enabled }}
-          command: {{ .Values.command.cmd }}
-          args: {{ .Values.command.args }}
+          args: 
+            {{- range $.Values.command.args }}
+            - {{ . }}
+            {{- end }}
         {{- end }}
 
         # the security context
