@@ -1,9 +1,4 @@
 ###################################################################################
-#################################### NAMESPACE ####################################
-###################################################################################
-namespace: bitcoin
-
-###################################################################################
 ##################################### REPLICAS ####################################
 ###################################################################################
 replicaCount: 1
@@ -33,10 +28,52 @@ service:
       targetPort: 8333
       protocol: TCP
       name: p2p-mainnet
-    - port: 29000          
+    - port: 28332          
+      targetPort: 28332 
+      protocol: TCP      
+      name: zmq-rawblock
+    - port: 28333          
+      targetPort: 28333 
+      protocol: TCP      
+      name: zmq-rawtax   
+    - port: 28334    
+      targetPort: 28334 
+      protocol: TCP      
+      name: zmq-hashblock   
+    - port: 28335          
+      targetPort: 28335 
+      protocol: TCP      
+      name: zmq-hashtx
+    - port: 29000    
       targetPort: 29000 
       protocol: TCP      
-      name: zmq   
+      name: zmq-all   
+
+###################################################################################
+################################## container ports ##################################
+###################################################################################
+containerPorts:
+  - containerPort: 8332
+    protocol: TCP
+    name: rpc-mainnet
+  - containerPort: 8333
+    protocol: TCP
+    name: p2p-mainnet
+  - containerPort: 28332
+    protocol: TCP
+    name: zmq-rawblock
+  - containerPort: 28333
+    protocol: TCP
+    name: zmq-rawtax
+  - containerPort: 28334
+    protocol: TCP
+    name: zmq-hashblock
+  - containerPort: 28335
+    protocol: TCP
+    name: zmq-hashtx
+  - containerPort: 29000
+    protocol: TCP
+    name: zmq-all
 
 ###################################################################################
 ################################## NODE SELECTOR ##################################
@@ -66,10 +103,10 @@ command:
 resources:
   requests:
     memory: "1Gi"
-    cpu: "0.2"
+    cpu: "0.1"
   limits:
     memory: "2Gi"
-    cpu: "0.4"
+    cpu: "0.2"
 
 ###################################################################################
 ##################################### PROBES ######################################

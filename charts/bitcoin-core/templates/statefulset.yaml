@@ -30,6 +30,7 @@ spec:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
 
+
       containers:
         - name: {{ include "bitcoin-core.name" . }}
           image: {{ include "bitcoin-core.image" . }}
@@ -37,6 +38,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 
+          ports:
+          {{- range $.Values.containerPorts }}
+            - containerPort: {{ .containerPort }}
+              protocol: {{ .protocol | quote }}
+              name: {{ .name | quote }}
+          {{- end }}
         # to override the command (to override options for example)
         {{- if .Values.command.enabled }}
           command: {{ .Values.command.cmd }}
