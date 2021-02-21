@@ -94,21 +94,21 @@ securityContext:
 ###################################### COMMAND ####################################
 ###################################################################################
 command: 
-  enabled: false
+  enabled: true
   args: [
-    "txindex=1",
-    "blockfilterindex=1",
-    "server=1",
-    "rpcbind=0.0.0.0",
-    "rpcallowip=172.0.0.0/8",
-    "rpcallowip=192.0.0.0/8",
-    "rpcallowip=127.0.0.1",
-    "rpcallowip=10.0.0.0/8",
-    "rpcport=8332",
-    "zmqpubrawblock=tcp://0.0.0.0:28332",
-    "zmqpubrawtx=tcp://0.0.0.0:28333",
-    "zmqpubhashblock=tcp://0.0.0.0:28334",
-    "zmqpubhashtx=tcp://0.0.0.0:28335"
+    "-txindex=1",
+    "-blockfilterindex=1",
+    "-server=1",
+    "-rpcbind=0.0.0.0",
+    "-rpcallowip=172.0.0.0/8",
+    "-rpcallowip=192.0.0.0/8",
+    "-rpcallowip=127.0.0.1",
+    "-rpcallowip=10.0.0.0/8",
+    "-rpcport=8332",
+    "-zmqpubrawblock=tcp://0.0.0.0:28332",
+    "-zmqpubrawtx=tcp://0.0.0.0:28333",
+    "-zmqpubhashblock=tcp://0.0.0.0:28334",
+    "-zmqpubhashtx=tcp://0.0.0.0:28335"
   ]
 
 ###################################################################################

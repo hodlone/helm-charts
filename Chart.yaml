@@ -8,5 +8,3 @@ author: Rick & Ron
 dependencies:
   - name: bitcoin-core
     version: 0.1.0
-  - name: lnd
-    version: 0.1.0
