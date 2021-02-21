@@ -2,6 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: {{ .Values.namespace }}
   name: {{ include "bitcoin-core.persistenVolumeName" . }}
 spec:
   storageClassName: {{ .Values.dataPersistency.storageClass }}

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "bitcoin-core.name" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "bitcoin-core.labels" . | nindent 4 }}
 spec:
