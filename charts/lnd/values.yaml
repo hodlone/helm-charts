@@ -7,7 +7,7 @@ replicaCount: 1
 ####################################### IMAGE #####################################
 ###################################################################################
 image:
-  name: "ruimarinho/bitcoin-core"
+  name: "gcr.io/nodehodl/lnd"
   tag: latest
   #pullPolicy: IfNotPresent # Always
 
@@ -20,60 +20,25 @@ service:
   type: "ClusterIP" 
   clusterIp: "None" # can be set to "None" for headless services
   ports: 
-    - port: 8332
-      targetPort: 8332
-      protocol: TCP
-      name: rpc-mainnet
-    - port: 8333
-      targetPort: 8333
+    - port: 9735
+      targetPort: 9735
       protocol: TCP
       name: p2p-mainnet
-    - port: 28332          
-      targetPort: 28332 
-      protocol: TCP      
-      name: zmq-rawblock
-    - port: 28333          
-      targetPort: 28333 
-      protocol: TCP      
-      name: zmq-rawtax   
-    - port: 28334    
-      targetPort: 28334 
-      protocol: TCP      
-      name: zmq-hashblock   
-    - port: 28335          
-      targetPort: 28335 
-      protocol: TCP      
-      name: zmq-hashtx
-    - port: 29000    
-      targetPort: 29000 
-      protocol: TCP      
-      name: zmq-all   
+    - port: 10009
+      targetPort: 10009
+      protocol: TCP
+      name: rpc
 
 ###################################################################################
 ################################## container ports ##################################
 ###################################################################################
 containerPorts:
-  - containerPort: 8332
-    protocol: TCP
-    name: rpc-mainnet
-  - containerPort: 8333
+  - containerPort: 9735
     protocol: TCP
     name: p2p-mainnet
-  - containerPort: 28332
+  - containerPort: 10009
     protocol: TCP
-    name: zmq-rawblock
-  - containerPort: 28333
-    protocol: TCP
-    name: zmq-rawtax
-  - containerPort: 28334
-    protocol: TCP
-    name: zmq-hashblock
-  - containerPort: 28335
-    protocol: TCP
-    name: zmq-hashtx
-  - containerPort: 29000
-    protocol: TCP
-    name: zmq-all
+    name: rpc
 
 ###################################################################################
 ################################## NODE SELECTOR ##################################
@@ -96,19 +61,15 @@ securityContext:
 command: 
   enabled: true
   args: [
-    "-txindex=1",
-    "-blockfilterindex=1",
-    "-server=1",
-    "-rpcbind=0.0.0.0",
-    "-rpcallowip=172.0.0.0/8",
-    "-rpcallowip=192.0.0.0/8",
-    "-rpcallowip=127.0.0.1",
-    "-rpcallowip=10.0.0.0/8",
-    "-rpcport=8332",
-    "-zmqpubrawblock=tcp://0.0.0.0:28332",
-    "-zmqpubrawtx=tcp://0.0.0.0:28333",
-    "-zmqpubhashblock=tcp://0.0.0.0:28334",
-    "-zmqpubhashtx=tcp://0.0.0.0:28335"
+    "--bitcoin.active",
+    "--bitcoin.mainnet",
+    "--debuglevel=debug",
+    "--bitcoin.node=bitcoind",
+    "--bitcoind.rpcuser=REPLACEME",
+    "--bitcoind.rpcpass=REPLACEME",
+    "--bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332",
+    "--bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333",
+    "--externalip=X.X.X.X"
   ]
 
 ###################################################################################
