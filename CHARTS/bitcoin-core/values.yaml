@@ -174,5 +174,7 @@ dataPersistency:
   accessModes: 
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  #providerPvConfig: a block containing the provider configuration for the persistent disks
+
 
  

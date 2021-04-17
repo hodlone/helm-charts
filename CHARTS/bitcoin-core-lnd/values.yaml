@@ -1,8 +1,14 @@
 bitcoin-core:
   replicaCount: 1
+  
+  
+  ############### Image ###############
   image:
     name: "ruimarinho/bitcoin-core"
     tag: latest
+  
+  
+  ############### Service ###############
   service:
     type: "ClusterIP" 
     clusterIp: "None" # can be set to "None" for headless services
@@ -15,10 +21,29 @@ bitcoin-core:
         targetPort: 8333
         protocol: TCP
         name: p2p-mainnet
+      - port: 28332          
+        targetPort: 28332 
+        protocol: TCP      
+        name: zmq-rawblock
+      - port: 28333          
+        targetPort: 28333 
+        protocol: TCP      
+        name: zmq-rawtax   
+      - port: 28334    
+        targetPort: 28334 
+        protocol: TCP      
+        name: zmq-hashblock   
+      - port: 28335          
+        targetPort: 28335 
+        protocol: TCP      
+        name: zmq-hashtx
       - port: 29000    
         targetPort: 29000 
         protocol: TCP      
-        name: zmq
+        name: zmq-all   
+  
+
+  ############### containerPorts ###############
   containerPorts:
     - containerPort: 8332
       protocol: TCP
@@ -26,16 +51,34 @@ bitcoin-core:
     - containerPort: 8333
       protocol: TCP
       name: p2p-mainnet
+    - containerPort: 28332
+      protocol: TCP
+      name: zmq-rawblock
+    - containerPort: 28333
+      protocol: TCP
+      name: zmq-rawtax
+    - containerPort: 28334
+      protocol: TCP
+      name: zmq-hashblock
+    - containerPort: 28335
+      protocol: TCP
+      name: zmq-hashtx
     - containerPort: 29000
       protocol: TCP
-      name: zmq
+      name: zmq-all
+
+  ############### Node Selector ###############
   nodeSelectorEnabled: true
   nodeSelector:
     preemptible: "false"
+
+  ############### Security Context ###############
   securityContext:
     enabled: false
     runAsUser: 100
     allowPrivilegeEscalation: false
+  
+  ############### command ###############
   command: 
     enabled: true
     args: [
@@ -48,12 +91,14 @@ bitcoin-core:
       "-rpcallowip=127.0.0.1",
       "-rpcallowip=10.0.0.0/8",
       "-rpcport=8332",
-      "-rpcauth=ron:5041aa0cf65d2635472f6725bf7d9876$84aac1c7b2fe48fee331209a1aadb2b8627c753b4f87b2e3405ce5e7882680ec",
-      "-zmqpubrawblock=tcp://0.0.0.0:29000",
-      "-zmqpubrawtx=tcp://0.0.0.0:29000",
-      "-zmqpubhashblock=tcp://0.0.0.0:29000",
-      "-zmqpubhashtx=tcp://0.0.0.0:29000"
+      "-rpcauth=DUMMY_RPC_AUTH_DATA",
+      "-zmqpubrawblock=tcp://0.0.0.0:28332",
+      "-zmqpubrawtx=tcp://0.0.0.0:28333",
+      "-zmqpubhashblock=tcp://0.0.0.0:28334",
+      "-zmqpubhashtx=tcp://0.0.0.0:28335"
     ]
+
+  ############### resources ###############
   resources:
     requests:
       memory: "1Gi"
@@ -61,7 +106,11 @@ bitcoin-core:
     limits:
       memory: "2Gi"
       cpu: "0.5"
+
+  ############### termination grace period ###############
   terminationGracePeriodSeconds: 300
+
+  ############### probes ###############
   probesEnabled: false
   livenessProbe:
     exec:
@@ -84,20 +133,23 @@ bitcoin-core:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
-  testMode: false # this will differentiate the names of the volumes for testnet/mainnet
+
+  ############### Data Persistency ###############
   dataPersistency:
     enabled: true
     mountPath: /home/bitcoin/.bitcoin
-    storageClass: bitcoin-fata
+    storageClass: bitcoin-data
     capacity: 500G
     gcePersistentDiskName: bitcoin-data-mainnet
+    #providerPvConfig: a block containing the provider configuration for the persistent disks
     accessModes:
       - ReadWriteOnce 
+    
   
 lnd:
   replicaCount: 1
   image:
-    name: "gcr.io/nodehodl/lnd"
+    name: "btcpayserver/lnd"
     tag: alpine
     #pullPolicy: IfNotPresent # Always
   service:
@@ -138,8 +190,8 @@ lnd:
       "--bitcoin.mainnet",
       "--debuglevel=debug",
       "--bitcoin.node=bitcoind",
-      "--bitcoind.rpcuser=bitcoin",
-      "--bitcoind.rpcpass=fIiet_JLr2Dz-MywqmDF2D3vGZCoIu8P2TZ6FpTjoUE=",
+      "--bitcoind.rpcuser=DUMMY_USER",
+      "--bitcoind.rpcpass=DUMMY_RPC_PASS",
       "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
       "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
       "--externalip=bitcoin-core:8332"
@@ -190,7 +242,7 @@ lnd:
     enabled: true
     mountPath: /home/root/.lnd
     storageClass: lnd-data
-    capacity: 500G
+    capacity: 5G
     gcePersistentDiskName: lnd-data-mainnet
     accessModes:
       - ReadWriteOnce 
