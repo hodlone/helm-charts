@@ -118,11 +118,9 @@ resources:
   requests:
     memory: "1Gi"
     cpu: "0.1"
-    ephemeral-storage: "1Gi"
   limits:
     memory: "2Gi"
     cpu: "0.6"
-    ephemeral-storage: "10Gi"
 
 ###################################################################################
 ##################################### PROBES ######################################
@@ -175,6 +173,6 @@ dataPersistency:
   capacity: "450Gi"
   accessModes: 
     - ReadWriteOnce
-  diskMountPath: /mnt/bitcoin-data
   persistentVolumeReclaimPolicy: Retain
 
+ 

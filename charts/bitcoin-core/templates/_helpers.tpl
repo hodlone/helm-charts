@@ -51,12 +51,3 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 "{{ .Values.image.name }}:{{ .Values.image.tag }}"
 {{- end -}}
 {{- end -}}
-
-{{/* ########### Create the full name for the persistent volume ########### */}}
-{{- define "bitcoin-core.persistenVolumeName" -}}
-{{- if .Values.dataPersistency.testMode -}}
-"{{ include "bitcoin-core.name" . }}-data-test"
-{{- else -}}
-"{{ include "bitcoin-core.name" . }}-data"
-{{- end -}}
-{{- end -}}

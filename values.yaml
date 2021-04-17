@@ -1,0 +1,196 @@
+bitcoin-core:
+  replicaCount: 1
+  image:
+    name: "ruimarinho/bitcoin-core"
+    tag: latest
+  service:
+    type: "ClusterIP" 
+    clusterIp: "None" # can be set to "None" for headless services
+    ports: 
+      - port: 8332
+        targetPort: 8332
+        protocol: TCP
+        name: rpc-mainnet
+      - port: 8333
+        targetPort: 8333
+        protocol: TCP
+        name: p2p-mainnet
+      - port: 29000    
+        targetPort: 29000 
+        protocol: TCP      
+        name: zmq
+  containerPorts:
+    - containerPort: 8332
+      protocol: TCP
+      name: rpc-mainnet
+    - containerPort: 8333
+      protocol: TCP
+      name: p2p-mainnet
+    - containerPort: 29000
+      protocol: TCP
+      name: zmq
+  nodeSelectorEnabled: true
+  nodeSelector:
+    preemptible: "false"
+  securityContext:
+    enabled: false
+    runAsUser: 100
+    allowPrivilegeEscalation: false
+  command: 
+    enabled: true
+    args: [
+      "-txindex=1",
+      "-blockfilterindex=1",
+      "-server=1",
+      "-rpcbind=0.0.0.0",
+      "-rpcallowip=172.0.0.0/8",
+      "-rpcallowip=192.0.0.0/8",
+      "-rpcallowip=127.0.0.1",
+      "-rpcallowip=10.0.0.0/8",
+      "-rpcport=8332",
+      "-rpcauth=ron:5041aa0cf65d2635472f6725bf7d9876$84aac1c7b2fe48fee331209a1aadb2b8627c753b4f87b2e3405ce5e7882680ec",
+      "-zmqpubrawblock=tcp://0.0.0.0:29000",
+      "-zmqpubrawtx=tcp://0.0.0.0:29000",
+      "-zmqpubhashblock=tcp://0.0.0.0:29000",
+      "-zmqpubhashtx=tcp://0.0.0.0:29000"
+    ]
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "0.1"
+    limits:
+      memory: "2Gi"
+      cpu: "0.5"
+  terminationGracePeriodSeconds: 300
+  probesEnabled: false
+  livenessProbe:
+    exec:
+      command:
+        - bitcoin-cli
+        - getblockcount
+    initialDelaySeconds: 300 
+    periodSeconds: 60
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  
+  readinessProbe:
+    exec:
+      command:
+        - bitcoin-cli
+        - getblockcount
+    initialDelaySeconds: 300
+    periodSeconds: 60
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  testMode: false # this will differentiate the names of the volumes for testnet/mainnet
+  dataPersistency:
+    enabled: true
+    mountPath: /home/bitcoin/.bitcoin
+    storageClass: bitcoin-fata
+    capacity: 500G
+    gcePersistentDiskName: bitcoin-data-mainnet
+    accessModes:
+      - ReadWriteOnce 
+  
+lnd:
+  replicaCount: 1
+  image:
+    name: "gcr.io/nodehodl/lnd"
+    tag: alpine
+    #pullPolicy: IfNotPresent # Always
+  service:
+    #nameOverride: "dummy-service"
+    type: "ClusterIP" 
+    clusterIp: "None" # can be set to "None" for headless services
+    ports: 
+      - port: 9735
+        targetPort: 9735
+        protocol: TCP
+        name: p2p-mainnet
+      - port: 10009
+        targetPort: 10009
+        protocol: TCP
+        name: rpc
+
+  containerPorts:
+    - containerPort: 9735
+      protocol: TCP
+      name: p2p-mainnet
+    - containerPort: 10009
+      protocol: TCP
+      name: rpc
+
+  nodeSelectorEnabled: true
+  nodeSelector:
+    preemptible: "false"
+
+  securityContext:
+    enabled: false
+    runAsUser: 100
+    allowPrivilegeEscalation: false
+
+  command: 
+    enabled: true
+    args: [
+      "--bitcoin.active",
+      "--bitcoin.mainnet",
+      "--debuglevel=debug",
+      "--bitcoin.node=bitcoind",
+      "--bitcoind.rpcuser=bitcoin",
+      "--bitcoind.rpcpass=fIiet_JLr2Dz-MywqmDF2D3vGZCoIu8P2TZ6FpTjoUE=",
+      "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
+      "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
+      "--externalip=bitcoin-core:8332"
+    ]
+
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "0.1"
+    limits:
+      memory: "2Gi"
+      cpu: "0.6"
+
+  terminationGracePeriodSeconds: 300
+  probesEnabled: false
+  livenessProbe:
+    exec:
+      command:
+        - bitcoin-cli
+        - getblockcount
+    # use generous initial delay. if the node was NOT propperly shutdown before, 
+    # the resync (rolling forward) will last for several hours before it is complete...
+    # during this time, all CLI commands will fail and kubernetes will kill the pod 
+    # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+    initialDelaySeconds: 300 
+    periodSeconds: 60
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+
+  readinessProbe:
+    exec:
+      command:
+        - bitcoin-cli
+        - getblockcount
+    # use generous initial delay. if the node was NOT propperly shutdown before, 
+    # the resync (rolling forward) will last for several hours before it is complete...
+    # during this time, all CLI commands will fail and kubernetes will kill the pod 
+    # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+    initialDelaySeconds: 300
+    periodSeconds: 60
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+
+
+  dataPersistency:
+    enabled: true
+    mountPath: /home/root/.lnd
+    storageClass: lnd-data
+    capacity: 500G
+    gcePersistentDiskName: lnd-data-mainnet
+    accessModes:
+      - ReadWriteOnce 
