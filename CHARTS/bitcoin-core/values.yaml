@@ -18,7 +18,7 @@ image:
 service:
   #nameOverride: "dummy-service"
   type: "ClusterIP" 
-  clusterIp: "None" # can be set to "None" for headless services
+  clusterIp: "None" # set to "None" for headless service configuration
   ports: 
     - port: 8332
       targetPort: 8332
@@ -44,14 +44,11 @@ service:
       targetPort: 28335 
       protocol: TCP      
       name: zmq-hashtx
-    - port: 29000    
-      targetPort: 29000 
-      protocol: TCP      
-      name: zmq-all   
 
 ###################################################################################
-################################## container ports ##################################
+################################## container ports ################################
 ###################################################################################
+# these are the ports opened in the container
 containerPorts:
   - containerPort: 8332
     protocol: TCP
@@ -71,20 +68,19 @@ containerPorts:
   - containerPort: 28335
     protocol: TCP
     name: zmq-hashtx
-  - containerPort: 29000
-    protocol: TCP
-    name: zmq-all
 
 ###################################################################################
 ################################## NODE SELECTOR ##################################
 ###################################################################################
+# select a stable worker node of the kubernetes cluster to avoid syncing issues 
 nodeSelectorEnabled: false
 nodeSelector:
-  preemptible: "false"
+  # preemptible: "false"
 
 ###################################################################################
 ################################# SECURITY CONTEXT ################################
 ###################################################################################
+# stablish what user and what privileges are used to run the bitcoin process
 securityContext:
   enabled: false
   runAsUser: 100
@@ -93,9 +89,13 @@ securityContext:
 ###################################################################################
 ###################################### COMMAND ####################################
 ###################################################################################
+# here you define the options for the node similarly to what you would do in the 
+# command line or the bitcoin.conf file; 
+# -regtest=1 is the default
 command: 
   enabled: true
   args: [
+    "-regtest=1",
     "-txindex=1",
     "-blockfilterindex=1",
     "-server=1",
@@ -114,6 +114,12 @@ command:
 ###################################################################################
 ##################################### RESOURCES ###################################
 ###################################################################################
+# when using a cloud provided disk with limited input/output capacity, errors and 
+# syncing problems may occur. in that situation, one can tweak the CPU and memory
+# to limit the I/O load capacity of the node. once fully synced it is ok to crank
+# these resources up to serve more requests per second. 
+# these defaults are a good starting point for a cloud provided standard disk
+# Running the numbers usually takes 5 min with these values 
 resources:
   requests:
     memory: "1Gi"
@@ -165,8 +171,7 @@ readinessProbe:
 ################################ DATA PERSISTENCY #################################
 ###################################################################################
 dataPersistency:
-  enabled: true
-  testMode: false # uses a different persistent volume for test purposes
+  enabled: false # data persistency is disabled by default 
   storageClass: bitcoin-core-data
   volumeMode: "Filesystem"
   mountPath: /home/bitcoin/.bitcoin
@@ -174,7 +179,9 @@ dataPersistency:
   accessModes: 
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  #providerPvConfig: a block containing the provider configuration for the persistent disks
+  
+  # a block containing the provider configuration for the persistent disks
+  #providerPvConfig: {}
 
 
  

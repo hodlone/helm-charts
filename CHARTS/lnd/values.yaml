@@ -8,7 +8,7 @@ replicaCount: 1
 ###################################################################################
 image:
   name: "gcr.io/nodehodl/lnd"
-  tag: latest
+  tag: alpine
   #pullPolicy: IfNotPresent # Always
 
 
@@ -18,7 +18,7 @@ image:
 service:
   #nameOverride: "dummy-service"
   type: "ClusterIP" 
-  clusterIp: "None" # can be set to "None" for headless services
+  clusterIp: "None" # set to "None" for headless service configuration
   ports: 
     - port: 9735
       targetPort: 9735
@@ -30,8 +30,9 @@ service:
       name: rpc
 
 ###################################################################################
-################################## container ports ##################################
+################################## container ports ################################
 ###################################################################################
+# these are the ports opened in the container
 containerPorts:
   - containerPort: 9735
     protocol: TCP
@@ -43,6 +44,7 @@ containerPorts:
 ###################################################################################
 ################################## NODE SELECTOR ##################################
 ###################################################################################
+# select a specific worker node of the kubernetes cluster  
 nodeSelectorEnabled: false
 nodeSelector:
   preemptible: "false"
@@ -50,6 +52,7 @@ nodeSelector:
 ###################################################################################
 ################################# SECURITY CONTEXT ################################
 ###################################################################################
+# stablish what user and what privileges are used to run the bitcoin process
 securityContext:
   enabled: false
   runAsUser: 100
@@ -58,8 +61,14 @@ securityContext:
 ###################################################################################
 ###################################### COMMAND ####################################
 ###################################################################################
+# here you define the options for the node similarly to what you would do in the 
+# command line; 
+# lnd requires the RPC credentials and host; it also needs addresses of the ZMQ 
+# interfaces of bitcoin-core node
+
 command: 
   enabled: true
+
   args: [
     "--bitcoin.active",
     "--bitcoin.mainnet",
@@ -67,9 +76,9 @@ command:
     "--bitcoin.node=bitcoind",
     "--bitcoind.rpcuser=REPLACEME",
     "--bitcoind.rpcpass=REPLACEME",
-    "--bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332",
-    "--bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333",
-    "--externalip=X.X.X.X"
+    "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
+    "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
+    "--externalip=bitcoin-core:8332"
   ]
 
 ###################################################################################
@@ -79,31 +88,23 @@ resources:
   requests:
     memory: "1Gi"
     cpu: "0.1"
-    ephemeral-storage: "1Gi"
   limits:
     memory: "2Gi"
     cpu: "0.6"
-    ephemeral-storage: "10Gi"
 
 ###################################################################################
 ##################################### PROBES ######################################
 ###################################################################################
-# use a generous grace period to avoid long resyncs (rolling forward) at restart
-# when the node receives SIGINT directive from kubernetes, it initiates a propper 
-# shutdown process that takes time... 300 seconds seems to be enough time. 
+# use a generous grace period to aid with propper shutdowns. 
 terminationGracePeriodSeconds: 300
-probesEnabled: false
+probesEnabled: true
 livenessProbe:
   exec:
     command:
-      - bitcoin-cli
-      - getblockcount
-  # use generous initial delay. if the node was NOT propperly shutdown before, 
-  # the resync (rolling forward) will last for several hours before it is complete...
-  # during this time, all CLI commands will fail and kubernetes will kill the pod 
-  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
-  initialDelaySeconds: 300 
-  periodSeconds: 60
+      - lncli
+      - state
+  initialDelaySeconds: 10 
+  periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 5
   successThreshold: 1
@@ -111,14 +112,10 @@ livenessProbe:
 readinessProbe:
   exec:
     command:
-      - bitcoin-cli
-      - getblockcount
-  # use generous initial delay. if the node was NOT propperly shutdown before, 
-  # the resync (rolling forward) will last for several hours before it is complete...
-  # during this time, all CLI commands will fail and kubernetes will kill the pod 
-  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
-  initialDelaySeconds: 300
-  periodSeconds: 60
+      - lncli
+      - state
+  initialDelaySeconds: 10
+  periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 5
   successThreshold: 1
@@ -128,14 +125,15 @@ readinessProbe:
 ################################ DATA PERSISTENCY #################################
 ###################################################################################
 dataPersistency:
-  enabled: true
-  testMode: false # uses a different persistent volume for test purposes
-  storageClass: bitcoin-core-data
+  enabled: false
+  storageClass: lnd-data
   volumeMode: "Filesystem"
-  mountPath: /home/bitcoin/.bitcoin
-  capacity: "450Gi"
+  mountPath: /home/root/.lnd
+  capacity: "5Gi"
   accessModes: 
     - ReadWriteOnce
-  diskMountPath: /mnt/bitcoin-data
   persistentVolumeReclaimPolicy: Retain
+  
+  # a block containing the provider configuration for the persistent disks
+  #providerPvConfig: {}
 

@@ -11,8 +11,9 @@ spec:
     {{- range $.Values.dataPersistency.accessModes }}
     - {{ . }}
     {{- end }}
-  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 }}
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: {{ .Values.dataPersistency.volumeName }}
+
+  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 }}
 {{- end }}

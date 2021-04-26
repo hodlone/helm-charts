@@ -7,13 +7,19 @@ metadata:
 spec:
   storageClassName: {{ .Values.dataPersistency.storageClass }}
   volumeMode: {{ .Values.dataPersistency.volumeMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.dataPersistency.persistentVolumeReclaimPolicy }}
+
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ .Values.dataPersistency.volumeName }}
+
   capacity:
     storage: {{ .Values.dataPersistency.capacity }}
-  persistentVolumeReclaimPolicy: {{ .Values.dataPersistency.persistentVolumeReclaimPolicy }}
+  
   accessModes:
     {{- range $.Values.dataPersistency.accessModes }}
     - {{ . }}
     {{- end }}
-  hostPath:
-    path: {{ .Values.dataPersistency.diskMountPath }}
+
+  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 }}
 {{- end }}
