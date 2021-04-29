@@ -19,7 +19,7 @@ helm gcs init ${GCS_BUCKET_NAME}
 echo "Adding gcs bucket repo ${GCS_BUCKET_NAME}"
 helm repo add private ${GCS_BUCKET_NAME}
 
-prev_rev=$(git rev-parse HEAD)
+prev_rev=$(git rev-parse HEAD^)
 echo "Identifying changed charts since git rev ${prev_rev}"
 
 changed_charts=()
