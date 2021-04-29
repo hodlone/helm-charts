@@ -1,0 +1,139 @@
+###################################################################################
+##################################### REPLICAS ####################################
+###################################################################################
+replicaCount: 1
+
+###################################################################################
+####################################### IMAGE #####################################
+###################################################################################
+image:
+  name: "elementsproject/lightningd"
+  tag: master
+  #pullPolicy: IfNotPresent # Always
+
+
+###################################################################################
+##################################### SERVICE #####################################
+###################################################################################
+service:
+  #nameOverride: "dummy-service"
+  type: "ClusterIP" 
+  clusterIp: "None" # set to "None" for headless service configuration
+  ports: 
+    - port: 9735
+      targetPort: 9735
+      protocol: TCP
+      name: p2p-mainnet
+    - port: 10009
+      targetPort: 10009
+      protocol: TCP
+      name: rpc
+
+###################################################################################
+################################## container ports ################################
+###################################################################################
+# these are the ports opened in the container
+containerPorts:
+  - containerPort: 9735
+    protocol: TCP
+    name: p2p-mainnet
+  - containerPort: 10009
+    protocol: TCP
+    name: rpc
+
+###################################################################################
+################################## NODE SELECTOR ##################################
+###################################################################################
+# select a specific worker node of the kubernetes cluster  
+nodeSelectorEnabled: false
+nodeSelector:
+  preemptible: "false"
+
+###################################################################################
+################################# SECURITY CONTEXT ################################
+###################################################################################
+# stablish what user and what privileges are used to run the bitcoin process
+securityContext:
+  enabled: false
+  runAsUser: 100
+  allowPrivilegeEscalation: false
+
+###################################################################################
+###################################### COMMAND ####################################
+###################################################################################
+# here you define the options for the node similarly to what you would do in the 
+# command line; 
+# lnd requires the RPC credentials and host; it also needs addresses of the ZMQ 
+# interfaces of bitcoin-core node
+
+command: 
+  enabled: true
+
+  args: [
+    "--bitcoin.active",
+    "--bitcoin.mainnet",
+    "--debuglevel=debug",
+    "--bitcoin.node=bitcoind",
+    "--bitcoind.rpcuser=REPLACEME",
+    "--bitcoind.rpcpass=REPLACEME",
+    "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
+    "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
+    "--externalip=bitcoin-core:8332"
+  ]
+
+###################################################################################
+##################################### RESOURCES ###################################
+###################################################################################
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "0.1"
+  limits:
+    memory: "2Gi"
+    cpu: "0.6"
+
+###################################################################################
+##################################### PROBES ######################################
+###################################################################################
+# use a generous grace period to aid with propper shutdowns. 
+terminationGracePeriodSeconds: 300
+probesEnabled: true
+livenessProbe:
+  exec:
+    command:
+      - lncli
+      - state
+  initialDelaySeconds: 10 
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+readinessProbe:
+  exec:
+    command:
+      - lncli
+      - state
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+
+###################################################################################
+################################ DATA PERSISTENCY #################################
+###################################################################################
+dataPersistency:
+  enabled: false
+  storageClass: lnd-data
+  volumeMode: "Filesystem"
+  mountPath: /home/root/.lnd
+  capacity: "5Gi"
+  accessModes: 
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  
+  # a block containing the provider configuration for the persistent disks
+  #providerPvConfig: {}
+
