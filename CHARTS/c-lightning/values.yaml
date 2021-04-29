@@ -63,7 +63,7 @@ securityContext:
 ###################################################################################
 # here you define the options for the node similarly to what you would do in the 
 # command line; 
-# lnd requires the RPC credentials and host; it also needs addresses of the ZMQ 
+# c-lightning requires the RPC credentials and host; it also needs addresses of the ZMQ 
 # interfaces of bitcoin-core node
 
 command: 
@@ -126,9 +126,9 @@ readinessProbe:
 ###################################################################################
 dataPersistency:
   enabled: false
-  storageClass: lnd-data
+  storageClass: c-lightning-data
   volumeMode: "Filesystem"
-  mountPath: /home/root/.lnd
+  mountPath: /home/root/.lightning
   capacity: "5Gi"
   accessModes: 
     - ReadWriteOnce
