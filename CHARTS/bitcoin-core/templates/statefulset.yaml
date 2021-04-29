@@ -72,12 +72,12 @@ spec:
         {{- if and .Values.dataPersistency.enabled }}
           volumeMounts:
             - mountPath: {{ .Values.dataPersistency.mountPath }}
-              name:  {{ .Values.dataPersistency.volumeName }}  
+              name:  {{ include "bitcoin-core.persistenVolumeName" . }}
         {{- end }}
     
     {{- if .Values.dataPersistency.enabled }}
       volumes:
-        - name:  {{ .Values.dataPersistency.volumeName }}
+        - name:  {{ include "bitcoin-core.persistenVolumeName" . }}
           persistentVolumeClaim:
-            claimName:  {{ .Values.dataPersistency.volumeName }}
+            claimName:  {{ include "bitcoin-core.persistenVolumeName" . }}
     {{- end }}

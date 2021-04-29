@@ -14,6 +14,5 @@ spec:
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: {{ include "bitcoin-core.persistenVolumeName" . }}
-
-  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 }}
+  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 -}}
 {{- end }}
