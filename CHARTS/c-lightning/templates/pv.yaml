@@ -11,7 +11,7 @@ spec:
 
   claimRef:
     namespace: {{ .Release.Namespace }}
-    name: {{ .Values.dataPersistency.volumeName }}
+    name: {{ include "c-lightning.persistenVolumeName" . }}
 
   capacity:
     storage: {{ .Values.dataPersistency.capacity }}

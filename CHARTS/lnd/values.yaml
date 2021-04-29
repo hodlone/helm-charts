@@ -74,8 +74,6 @@ command:
     "--bitcoin.mainnet",
     "--debuglevel=debug",
     "--bitcoin.node=bitcoind",
-    "--bitcoind.rpcuser=REPLACEME",
-    "--bitcoind.rpcpass=REPLACEME",
     "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
     "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
     "--externalip=bitcoin-core:8332"

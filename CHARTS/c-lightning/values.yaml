@@ -8,7 +8,7 @@ replicaCount: 1
 ###################################################################################
 image:
   name: "elementsproject/lightningd"
-  tag: master
+  tag: latest
   #pullPolicy: IfNotPresent # Always
 
 
@@ -24,10 +24,6 @@ service:
       targetPort: 9735
       protocol: TCP
       name: p2p-mainnet
-    - port: 10009
-      targetPort: 10009
-      protocol: TCP
-      name: rpc
 
 ###################################################################################
 ################################## container ports ################################
@@ -37,9 +33,6 @@ containerPorts:
   - containerPort: 9735
     protocol: TCP
     name: p2p-mainnet
-  - containerPort: 10009
-    protocol: TCP
-    name: rpc
 
 ###################################################################################
 ################################## NODE SELECTOR ##################################
@@ -63,22 +56,18 @@ securityContext:
 ###################################################################################
 # here you define the options for the node similarly to what you would do in the 
 # command line; 
-# c-lightning requires the RPC credentials and host; it also needs addresses of the ZMQ 
-# interfaces of bitcoin-core node
+# c-lightning requires the RPC credentials and host
 
 command: 
   enabled: true
 
   args: [
-    "--bitcoin.active",
-    "--bitcoin.mainnet",
-    "--debuglevel=debug",
-    "--bitcoin.node=bitcoind",
-    "--bitcoind.rpcuser=REPLACEME",
-    "--bitcoind.rpcpass=REPLACEME",
-    "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
-    "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
-    "--externalip=bitcoin-core:8332"
+    "--network=bitcoin",
+    "--log-level=debug",
+    "--bind-addr=127.0.0.1:9735",
+    "--allow-deprecated-apis=false",
+    "--bitcoin-rpcconnect=bitcoin-core",
+    "--bitcoin-rpcport=8332"
   ]
 
 ###################################################################################
@@ -101,7 +90,7 @@ probesEnabled: true
 livenessProbe:
   exec:
     command:
-      - lncli
+      - lightning-cli
       - state
   initialDelaySeconds: 10 
   periodSeconds: 10
@@ -112,7 +101,7 @@ livenessProbe:
 readinessProbe:
   exec:
     command:
-      - lncli
+      - lightning-cli
       - state
   initialDelaySeconds: 10
   periodSeconds: 10
@@ -136,4 +125,3 @@ dataPersistency:
   
   # a block containing the provider configuration for the persistent disks
   #providerPvConfig: {}
-

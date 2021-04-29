@@ -47,6 +47,8 @@ spec:
         # to override the command (to override options for example)
         {{- if .Values.command.enabled }}
           args: 
+            - {{ .Values.rpcuser }} 
+            - {{ .Values.rpcpassword }}
             {{- range $.Values.command.args }}
             - {{ . }}
             {{- end }}
