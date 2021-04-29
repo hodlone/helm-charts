@@ -1,10 +1,10 @@
 {{/* ########### Name ########### */}}
-{{- define "lnd.name" -}}
+{{- define "c-lightning.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* ########### FullName ########### */}}
-{{- define "lnd.fullname" -}}
+{{- define "c-lightning.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -18,25 +18,25 @@
 {{- end -}}
 
 {{/* ########### Chart ########### */}}
-{{- define "lnd.chart" -}}
+{{- define "c-lightning.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* ########### Service Name ########### */}}
-{{- define "lnd.serviceName" -}}
+{{- define "c-lightning.serviceName" -}}
 {{- default .Chart.Name .Values.service.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* ########### Selector labels ########### */}}
-{{- define "lnd.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "lnd.name" . }}
+{{- define "c-lightning.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "c-lightning.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/* ########### All labels ########### */}}
-{{- define "lnd.labels" -}}
-helm.sh/chart: {{ include "lnd.chart" . }}
-{{ include "lnd.selectorLabels" . }}
+{{- define "c-lightning.labels" -}}
+helm.sh/chart: {{ include "c-lightning.chart" . }}
+{{ include "c-lightning.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -44,7 +44,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/* ########### Image Selection Helper ########### */}}
-{{- define "lnd.image" -}}
+{{- define "c-lightning.image" -}}
 {{- if contains "sha:" .Values.image.tag -}}
 "{{ .Values.image.name }}@{{ .Values.image.tag }}"
 {{- else -}}
@@ -53,10 +53,10 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/* ########### Create the full name for the persistent volume ########### */}}
-{{- define "lnd.persistenVolumeName" -}}
+{{- define "c-lightning.persistenVolumeName" -}}
 {{- if .Values.dataPersistency.testMode -}}
-"{{ include "lnd.name" . }}-data-test"
+"{{ include "c-lightning.name" . }}-data-test"
 {{- else -}}
-"{{ include "lnd.name" . }}-data"
+"{{ include "c-lightning.name" . }}-data"
 {{- end -}}
 {{- end -}}

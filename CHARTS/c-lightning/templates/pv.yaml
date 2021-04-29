@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "lnd.persistenVolumeName" . }}
+  name: {{ include "c-lightning.persistenVolumeName" . }}
   namespace: {{ .Values.namespace }}
 spec:
   storageClassName: {{ .Values.dataPersistency.storageClass }}
@@ -11,7 +11,7 @@ spec:
 
   claimRef:
     namespace: {{ .Release.Namespace }}
-    name: {{ include "lnd.persistenVolumeName" . }}
+    name: {{ include "c-lightning.persistenVolumeName" . }}
 
   capacity:
     storage: {{ .Values.dataPersistency.capacity }}

@@ -11,7 +11,6 @@ image:
   tag: latest
   #pullPolicy: IfNotPresent # Always
 
-
 ###################################################################################
 ##################################### SERVICE #####################################
 ###################################################################################
@@ -182,6 +181,4 @@ dataPersistency:
   
   # a block containing the provider configuration for the persistent disks
   #providerPvConfig: {}
-
-
  

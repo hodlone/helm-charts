@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "lnd.name" . }}
+  name: {{ include "c-lightning.name" . }}
   namespace: {{ .Values.namespace }}
   labels:
-    {{- include "lnd.labels" . | nindent 4 }}
+    {{- include "c-lightning.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
 
   selector:
     matchLabels:
-      {{- include "lnd.selectorLabels" . | nindent 6 }}
+      {{- include "c-lightning.selectorLabels" . | nindent 6 }}
 
-  serviceName: {{ include "lnd.serviceName" . }}
+  serviceName: {{ include "c-lightning.serviceName" . }}
   template:
     metadata:
       labels:
-        {{- include "lnd.selectorLabels" . | nindent 8 }}
+        {{- include "c-lightning.selectorLabels" . | nindent 8 }}
   
     spec:
       # this is really important to prevent kubernetes killing the node unexpectedly
@@ -32,8 +32,8 @@ spec:
 
 
       containers:
-        - name: {{ include "lnd.name" . }}
-          image: {{ include "lnd.image" . }}
+        - name: {{ include "c-lightning.name" . }}
+          image: {{ include "c-lightning.image" . }}
           imagePullPolicy: {{ default "IfNotPresent" .Values.image.pullPolicy }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -47,7 +47,7 @@ spec:
         # to override the command (to override options for example)
         {{- if .Values.command.enabled }}
           args: 
-            - {{ .Values.rpcuser }} 
+            - {{ .Values.rpcuser }}
             - {{ .Values.rpcpassword }}
             {{- range $.Values.command.args }}
             - {{ . }}
@@ -74,12 +74,12 @@ spec:
         {{- if and .Values.dataPersistency.enabled }}
           volumeMounts:
             - mountPath: {{ .Values.dataPersistency.mountPath }}
-              name: {{ include "lnd.persistenVolumeName" . }}  
+              name: {{ include "c-lightning.persistenVolumeName" . }}  
         {{- end }}
     
     {{- if .Values.dataPersistency.enabled }}
       volumes:
-        - name: {{ include "lnd.persistenVolumeName" . }}
+        - name: {{ include "c-lightning.persistenVolumeName" . }}
           persistentVolumeClaim:
-            claimName: {{ include "lnd.persistenVolumeName" . }}
+            claimName: {{ include "c-lightning.persistenVolumeName" . }}
     {{- end }}
