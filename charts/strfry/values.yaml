@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ronaldcrb/strfry # litch/strfry 
+  repository: ronaldcrb/strfry            # also can use litch/strfry
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -23,17 +23,17 @@ command:
   # use the sync OR stream options (source relay MUST be responsive on the specified address at the moment of deploy)
   #
   # sync:
-  # Effectively what this does is figure out which events the remote relay has that you don't, and vice versa. 
+  # Effectively what this does is figure out which events the remote relay has that you don't, and vice versa.
   # Assuming that you both have common subsets of events, it does this more efficiently than simply transferring the
   # full set of events (or even just their ids).
 
   # stream:
   # This command opens a websocket connection to the specified relay and makes a nostr REQ request with filter {"limit":0}:
-  # All events that are streamed back are inserted into the DB (after validation, checking for duplicates, etc). If the 
+  # All events that are streamed back are inserted into the DB (after validation, checking for duplicates, etc). If the
   # connection is closed for any reason, the command will try reconnecting every 5 seconds.
   # You can also run it in the opposite direction, which monitors your local DB for any new events and posts them to the specified relay:
-  # Both of these operations can be concurrently multiplexed over the same websocket: 
-  # strfry stream will compress messages with permessage-deflate in both directions, if supported by the server. 
+  # Both of these operations can be concurrently multiplexed over the same websocket:
+  # strfry stream will compress messages with permessage-deflate in both directions, if supported by the server.
   # Sliding window is not supported for now.
 
   args: [
@@ -123,11 +123,11 @@ persistence:
   volumeMode: "Filesystem"
   mountPath: /app/strfry-db
   capacity: "10Gi"
-  accessModes: 
+  accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   # a block containing the provider configuration for the persistent disks
-  #providerPvConfig: {}
+  # providerPvConfig: {}
 
 ##############################
 #### StrFry Configuration ####
@@ -149,7 +149,7 @@ config:
 
       # NIP-11: Alternative administrative contact (email, website, etc)
       contact: "unset"
-    
+
     # Maximum accepted incoming websocket frame size (should be larger than max event and yesstr msg)
     maxWebsocketPayloadSize: 131072
 
@@ -164,7 +164,7 @@ config:
 
     # Maximum records that can be returned per filter
     maxFilterLimit: 500
-  
+
     logging:
       # Dump all incoming messages
       dumpInAll: "false"
@@ -174,31 +174,31 @@ config:
       dumpInReqs: "false"
       # Log performance metrics for initial REQ database scans
       dbScanPerf: "false"
-    
+
     numThreads:
       ingester: "3"
       reqWorker: "3"
       reqMonitor: "3"
       yesstr: "1"
-    
+
     events:
       # Maximum size of normalised JSON, in bytes
       maxEventSize: "65536"
-    
+
       # Events newer than this will be rejected
       rejectEventsNewerThanSeconds: "900"
-  
+
       # Events older than this will be rejected
       rejectEventsOlderThanSeconds: "94608000"
-  
+
       # Ephemeral events older than this will be rejected
       rejectEphemeralEventsOlderThanSeconds: "60"
-  
+
       # Ephemeral events will be deleted from the DB when older than this
       ephemeralEventsLifetimeSeconds: "300"
-  
+
       # Maximum number of tags allowed
       maxNumTags: "250"
-    
+
       # Maximum size for tag values, in bytes
       maxTagValSize: "255"
