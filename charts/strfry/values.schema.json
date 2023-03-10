@@ -1,0 +1,480 @@
+{
+  "type": "object",
+  "required": [
+    "replicaCount",
+    "image",
+    "imagePullSecrets",
+    "nameOverride",
+    "fullnameOverride",
+    "terminationGracePeriodSeconds",
+    "command",
+    "nodeSelector",
+    "affinity",
+    "tolerations",
+    "statefulSet",
+    "service",
+    "ingress",
+    "serviceAccount",
+    "probesEnabled",
+    "startupProbe",
+    "readinessProbe",
+    "livenessProbe",
+    "podSecurityContext",
+    "securityContext",
+    "resources",
+    "persistence",
+    "config"
+  ],
+  "properties": {
+    "replicaCount": {
+      "type": "number"
+    },
+    "image": {
+      "type": "object",
+      "required": [
+        "repository",
+        "pullPolicy",
+        "tag"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "pullPolicy": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "items": {}
+    },
+    "nameOverride": {
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "type": "string"
+    },
+    "terminationGracePeriodSeconds": {
+      "type": "number"
+    },
+    "command": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "cmd",
+        "args"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "cmd": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "args": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "affinity": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "tolerations": {
+      "type": "array",
+      "items": {}
+    },
+    "statefulSet": {
+      "type": "object",
+      "required": [
+        "annotations",
+        "containerPorts"
+      ],
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "required": [
+            "environment"
+          ],
+          "properties": {
+            "environment": {
+              "type": "string"
+            }
+          }
+        },
+        "containerPorts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "containerPort",
+              "protocol",
+              "name"
+            ],
+            "properties": {
+              "containerPort": {
+                "type": "number"
+              },
+              "protocol": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": [
+        "type",
+        "port",
+        "labels",
+        "portName"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "labels": {
+          "type": "object",
+          "required": [],
+          "properties": {}
+        },
+        "portName": {
+          "type": "string"
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "className",
+        "annotations",
+        "hosts",
+        "tls"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "annotations": {
+          "type": "object",
+          "required": [],
+          "properties": {}
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "host",
+              "paths"
+            ],
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "pathType"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "pathType": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tls": {
+          "type": "array",
+          "items": {}
+        }
+      }
+    },
+    "serviceAccount": {
+      "type": "object",
+      "required": [
+        "create",
+        "annotations",
+        "name"
+      ],
+      "properties": {
+        "create": {
+          "type": "boolean"
+        },
+        "annotations": {
+          "type": "object",
+          "required": [],
+          "properties": {}
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "probesEnabled": {
+      "type": "boolean"
+    },
+    "startupProbe": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "readinessProbe": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "livenessProbe": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "securityContext": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "resources": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "persistence": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "preProvisionedDataVolume",
+        "claimName",
+        "storageClass",
+        "volumeMode",
+        "mountPath",
+        "capacity",
+        "accessModes",
+        "persistentVolumeReclaimPolicy"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "preProvisionedDataVolume": {
+          "type": "boolean"
+        },
+        "claimName": {
+          "type": "string"
+        },
+        "storageClass": {
+          "type": "string"
+        },
+        "volumeMode": {
+          "type": "string"
+        },
+        "mountPath": {
+          "type": "string"
+        },
+        "capacity": {
+          "type": "string"
+        },
+        "accessModes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "persistentVolumeReclaimPolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": [
+        "mountPath",
+        "subPath",
+        "relay"
+      ],
+      "properties": {
+        "mountPath": {
+          "type": "string"
+        },
+        "subPath": {
+          "type": "string"
+        },
+        "relay": {
+          "type": "object",
+          "required": [
+            "info",
+            "maxWebsocketPayloadSize",
+            "autoPingSeconds",
+            "enableTcpKeepalive",
+            "queryTimesliceBudgetMicroseconds",
+            "maxFilterLimit",
+            "logging",
+            "numThreads",
+            "events"
+          ],
+          "properties": {
+            "info": {
+              "type": "object",
+              "required": [
+                "name",
+                "description",
+                "pubkey",
+                "contact"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "pubkey": {
+                  "type": "string"
+                },
+                "contact": {
+                  "type": "string"
+                }
+              }
+            },
+            "maxWebsocketPayloadSize": {
+              "type": "number"
+            },
+            "autoPingSeconds": {
+              "type": "number"
+            },
+            "enableTcpKeepalive": {
+              "type": "string"
+            },
+            "queryTimesliceBudgetMicroseconds": {
+              "type": "number"
+            },
+            "maxFilterLimit": {
+              "type": "number"
+            },
+            "logging": {
+              "type": "object",
+              "required": [
+                "dumpInAll",
+                "dumpInEvents",
+                "dumpInReqs",
+                "dbScanPerf"
+              ],
+              "properties": {
+                "dumpInAll": {
+                  "type": "string"
+                },
+                "dumpInEvents": {
+                  "type": "string"
+                },
+                "dumpInReqs": {
+                  "type": "string"
+                },
+                "dbScanPerf": {
+                  "type": "string"
+                }
+              }
+            },
+            "numThreads": {
+              "type": "object",
+              "required": [
+                "ingester",
+                "reqWorker",
+                "reqMonitor",
+                "yesstr"
+              ],
+              "properties": {
+                "ingester": {
+                  "type": "string"
+                },
+                "reqWorker": {
+                  "type": "string"
+                },
+                "reqMonitor": {
+                  "type": "string"
+                },
+                "yesstr": {
+                  "type": "string"
+                }
+              }
+            },
+            "events": {
+              "type": "object",
+              "required": [
+                "maxEventSize",
+                "rejectEventsNewerThanSeconds",
+                "rejectEventsOlderThanSeconds",
+                "rejectEphemeralEventsOlderThanSeconds",
+                "ephemeralEventsLifetimeSeconds",
+                "maxNumTags",
+                "maxTagValSize"
+              ],
+              "properties": {
+                "maxEventSize": {
+                  "type": "string"
+                },
+                "rejectEventsNewerThanSeconds": {
+                  "type": "string"
+                },
+                "rejectEventsOlderThanSeconds": {
+                  "type": "string"
+                },
+                "rejectEphemeralEventsOlderThanSeconds": {
+                  "type": "string"
+                },
+                "ephemeralEventsLifetimeSeconds": {
+                  "type": "string"
+                },
+                "maxNumTags": {
+                  "type": "string"
+                },
+                "maxTagValSize": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
