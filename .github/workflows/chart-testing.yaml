@@ -51,20 +51,24 @@ jobs:
           sudo mv ct /usr/local/bin/ct
           mkdir ~/.ct
           mv etc/*.yaml ~/.ct/
-          
+      
+      # Test the charts that have changed (compared to master branch)
       - name: Test Charts
         run: ct lint $(ct list-changed)
 
+      # package all charts in the `charts` directory
       - name: Package Charts
         run: make
 
+      # generates an updated index
       - name: Generate new index
         run: make index
 
+      # push all artifacts (chart tarballs and index manifest) to the current branch 
       - name: Push Generated Artifacts
         uses: devops-infra/action-commit-push@master
         with:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
-          add_timestamp: true
           commit_prefix: "[CI]"
           commit_message: "Automated charts packages and index update"
+          target_branch: ${{ github.base_ref }}
