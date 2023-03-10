@@ -3,9 +3,9 @@ entries:
   bitcoind:
   - apiVersion: v2
     appVersion: 0.23.0
-    created: "2023-03-10T14:42:00.367383813-04:00"
+    created: "2023-03-10T14:47:49.831739277-04:00"
     description: A Helm Chart for Bitcoin Core
-    digest: 1cb443917adc715d7f147ef1973c9379083e67464482e00b4b2dbb85faf6f479
+    digest: 7ec44e46945eab605150a8d9f4808b33ab51d2ae32faf529e933331263a006ab
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -14,14 +14,14 @@ entries:
     name: bitcoind
     type: application
     urls:
-    - https://hodlone.github.io/helm-charts/PKG/bitcoind-0.1.4.tgz
+    - https://hodlone.github.io/helm-charts/docs/bitcoind-0.1.4.tgz
     version: 0.1.4
   c-lightning:
   - apiVersion: v2
     appVersion: 0.10.0
-    created: "2023-03-10T14:42:00.367718371-04:00"
+    created: "2023-03-10T14:47:49.832079261-04:00"
     description: A Helm chart for the c-lightning client
-    digest: 2e3c51ff40265454dea1a2429cf67dce5c931558999dedba7cd18170f456a322
+    digest: b12484466d143df8bfdc6f9e3a901701223e20b2b6cbc09756490f1df326e129
     maintainers:
     - email: alonzoricardo6@gmail.com
       name: Rick Alonzo
@@ -30,14 +30,14 @@ entries:
     name: c-lightning
     type: application
     urls:
-    - https://hodlone.github.io/helm-charts/PKG/c-lightning-0.1.0.tgz
+    - https://hodlone.github.io/helm-charts/docs/c-lightning-0.1.0.tgz
     version: 0.1.0
   lnd:
   - apiVersion: v2
     appVersion: 0.15.0
-    created: "2023-03-10T14:42:00.368067896-04:00"
+    created: "2023-03-10T14:47:49.832457435-04:00"
     description: A Helm Chart for Lightning Network Daemon
-    digest: 3457be5325503307b9bef89d63547be065749a43e726b31b208c10d5529a3370
+    digest: 0bcddeaf77071b611c389cf998f635d2a512ff21a97435731e463a5da489084b
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -46,6 +46,6 @@ entries:
     name: lnd
     type: application
     urls:
-    - https://hodlone.github.io/helm-charts/PKG/lnd-0.1.3.tgz
+    - https://hodlone.github.io/helm-charts/docs/lnd-0.1.3.tgz
     version: 0.1.3
-generated: "2023-03-10T14:42:00.366849918-04:00"
+generated: "2023-03-10T14:47:49.830965376-04:00"
