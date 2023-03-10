@@ -3,9 +3,9 @@ entries:
   bitcoind:
   - apiVersion: v2
     appVersion: 0.23.0
-    created: "2023-03-10T14:47:49.831739277-04:00"
+    created: "2023-03-10T15:41:14.493597191-04:00"
     description: A Helm Chart for Bitcoin Core
-    digest: 7ec44e46945eab605150a8d9f4808b33ab51d2ae32faf529e933331263a006ab
+    digest: 292ffbede3c9018d8834be6516d3049a24435235d474feff5a430bf4e4915fb7
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -19,9 +19,9 @@ entries:
   c-lightning:
   - apiVersion: v2
     appVersion: 0.10.0
-    created: "2023-03-10T14:47:49.832079261-04:00"
+    created: "2023-03-10T15:41:14.494733395-04:00"
     description: A Helm chart for the c-lightning client
-    digest: b12484466d143df8bfdc6f9e3a901701223e20b2b6cbc09756490f1df326e129
+    digest: 891123bb31262c0c34aeeddacbfe61f31ad93933909af6cb624e3158ab63bb1d
     maintainers:
     - email: alonzoricardo6@gmail.com
       name: Rick Alonzo
@@ -35,9 +35,9 @@ entries:
   lnd:
   - apiVersion: v2
     appVersion: 0.15.0
-    created: "2023-03-10T14:47:49.832457435-04:00"
+    created: "2023-03-10T15:41:14.495485092-04:00"
     description: A Helm Chart for Lightning Network Daemon
-    digest: 0bcddeaf77071b611c389cf998f635d2a512ff21a97435731e463a5da489084b
+    digest: 133e360a5fc14d1741c9dc446fcb7d163be1be420878ae48f1f80ed8b0a16f52
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -48,4 +48,4 @@ entries:
     urls:
     - https://hodlone.github.io/helm-charts/docs/lnd-0.1.3.tgz
     version: 0.1.3
-generated: "2023-03-10T14:47:49.830965376-04:00"
+generated: "2023-03-10T15:41:14.492592274-04:00"
