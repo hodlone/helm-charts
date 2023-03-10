@@ -1,0 +1,204 @@
+# Default values for strfry.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ronaldcrb/strfry # litch/strfry 
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+terminationGracePeriodSeconds: 180
+
+command:
+  # Override the command with options
+  enabled: false
+  cmd: ["./strfry"]
+  # use the sync OR stream options (source relay MUST be responsive on the specified address at the moment of deploy)
+  #
+  # sync:
+  # Effectively what this does is figure out which events the remote relay has that you don't, and vice versa. 
+  # Assuming that you both have common subsets of events, it does this more efficiently than simply transferring the
+  # full set of events (or even just their ids).
+
+  # stream:
+  # This command opens a websocket connection to the specified relay and makes a nostr REQ request with filter {"limit":0}:
+  # All events that are streamed back are inserted into the DB (after validation, checking for duplicates, etc). If the 
+  # connection is closed for any reason, the command will try reconnecting every 5 seconds.
+  # You can also run it in the opposite direction, which monitors your local DB for any new events and posts them to the specified relay:
+  # Both of these operations can be concurrently multiplexed over the same websocket: 
+  # strfry stream will compress messages with permessage-deflate in both directions, if supported by the server. 
+  # Sliding window is not supported for now.
+
+  args: [
+  # "sync",
+  # "stream",
+  # "wss://my-source-relay"
+  ]
+
+nodeSelector: {}
+affinity: {}
+tolerations: []
+
+statefulSet:
+  annotations:
+    environment: placeholder
+  containerPorts:
+  - containerPort: 7777
+    protocol: TCP
+    name: wss
+
+service:
+  type: ClusterIP
+  port: 7777
+  labels: {}
+  portName: wss
+
+ingress:
+  enabled: false
+  className: "traefik-internal"
+  annotations: {}
+    # kubernetes.io/ingress.class: traefik-internal
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: myrelay.mydomain.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# toggle all probes on/off
+probesEnabled: false
+startupProbe: {}
+readinessProbe: {}
+livenessProbe: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Data Persistency ##
+persistence:
+  enabled: true
+  preProvisionedDataVolume: false
+  claimName: "nostr-data"
+
+  storageClass: gp2
+  volumeMode: "Filesystem"
+  mountPath: /app/strfry-db
+  capacity: "10Gi"
+  accessModes: 
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  # a block containing the provider configuration for the persistent disks
+  #providerPvConfig: {}
+
+##############################
+#### StrFry Configuration ####
+##############################
+config:
+  mountPath: /app/strfry.conf
+  subPath: strfry.conf
+  # All values in this section should be expressed as strings to avoid templating errors
+  relay:
+    info:
+      # NIP-11: Name of this server. Short/descriptive (< 30 characters)
+      name: "strfry default"
+
+      # NIP-11: Detailed information about relay, free-form
+      description: "This is a strfry instance."
+
+      # NIP-11: Administrative nostr pubkey, for contact purposes
+      pubkey: "unset"
+
+      # NIP-11: Alternative administrative contact (email, website, etc)
+      contact: "unset"
+    
+    # Maximum accepted incoming websocket frame size (should be larger than max event and yesstr msg)
+    maxWebsocketPayloadSize: 131072
+
+    # Websocket-level PING message frequency (should be less than any reverse proxy idle timeouts)
+    autoPingSeconds: 55
+
+    # If TCP keep-alive should be enabled (detect dropped connections to upstream reverse proxy)
+    enableTcpKeepalive: "false"
+
+    # How much uninterrupted CPU time a REQ query should get during its DB scan
+    queryTimesliceBudgetMicroseconds: 10000
+
+    # Maximum records that can be returned per filter
+    maxFilterLimit: 500
+  
+    logging:
+      # Dump all incoming messages
+      dumpInAll: "false"
+      # Dump all incoming EVENT messages
+      dumpInEvents: "false"
+      # Dump all incoming REQ/CLOSE messages
+      dumpInReqs: "false"
+      # Log performance metrics for initial REQ database scans
+      dbScanPerf: "false"
+    
+    numThreads:
+      ingester: "3"
+      reqWorker: "3"
+      reqMonitor: "3"
+      yesstr: "1"
+    
+    events:
+      # Maximum size of normalised JSON, in bytes
+      maxEventSize: "65536"
+    
+      # Events newer than this will be rejected
+      rejectEventsNewerThanSeconds: "900"
+  
+      # Events older than this will be rejected
+      rejectEventsOlderThanSeconds: "94608000"
+  
+      # Ephemeral events older than this will be rejected
+      rejectEphemeralEventsOlderThanSeconds: "60"
+  
+      # Ephemeral events will be deleted from the DB when older than this
+      ephemeralEventsLifetimeSeconds: "300"
+  
+      # Maximum number of tags allowed
+      maxNumTags: "250"
+    
+      # Maximum size for tag values, in bytes
+      maxTagValSize: "255"

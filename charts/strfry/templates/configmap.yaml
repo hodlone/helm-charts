@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "strfry.configMapName" . }}
+  labels:
+    {{- include "strfry.labels" . | nindent 4 }}
+data:
+  strfry.conf: |-
+    # Directory that contains strfry database
+    db = {{ .Values.persistence.mountPath | quote }}
+    
+    relay {
+        # Interface to listen on. Use 0.0.0.0 to listen on all interfaces
+        bind = "0.0.0.0"
+    
+        # Port to open for the nostr websocket protocol
+        port = {{ .Values.service.port }}
+    
+        info {
+            # NIP-11: Name of this server. Short/descriptive (< 30 characters)
+            name = {{ .Values.config.relay.info.name | quote }}
+    
+            # NIP-11: Detailed information about relay, free-form
+            description = {{ .Values.config.relay.info.description | quote }}
+    
+            # NIP-11: Administrative nostr pubkey, for contact purposes
+            pubkey = {{ .Values.config.relay.info.pubkey | quote }}
+    
+            # NIP-11: Alternative administrative contact (email, website, etc)
+            contact = {{ .Values.config.relay.info.contact | quote }}
+        }
+    
+        # Maximum accepted incoming websocket frame size (should be larger than max event and yesstr msg)
+        maxWebsocketPayloadSize = {{ .Values.config.relay.maxWebsocketPayloadSize }}
+    
+        # Websocket-level PING message frequency (should be less than any reverse proxy idle timeouts)
+        autoPingSeconds = {{ .Values.config.relay.autoPingSeconds }}
+    
+        # If TCP keep-alive should be enabled (detect dropped connections to upstream reverse proxy)
+        enableTcpKeepalive = {{ .Values.config.relay.enableTcpKeepalive }}
+    
+        # How much uninterrupted CPU time a REQ query should get during its DB scan
+        queryTimesliceBudgetMicroseconds = {{ .Values.config.relay.queryTimesliceBudgetMicroseconds }}
+    
+        # Maximum records that can be returned per filter
+        maxFilterLimit = {{ .Values.config.relay.maxFilterLimit }}
+    
+        logging {
+            # Dump all incoming messages
+            dumpInAll = {{ .Values.config.relay.logging.dumpInAll }}
+    
+            # Dump all incoming EVENT messages
+            dumpInEvents = {{ .Values.config.relay.logging.dumpInEvents }}
+    
+            # Dump all incoming REQ/CLOSE messages
+            dumpInReqs = {{ .Values.config.relay.logging.dumpInReqs }}
+    
+            # Log performance metrics for initial REQ database scans
+            dbScanPerf = {{ .Values.config.relay.logging.dbScanPerf }}
+        }
+    
+        numThreads {
+            ingester = {{ .Values.config.relay.numThreads.ingester }}
+    
+            reqWorker = {{ .Values.config.relay.numThreads.reqWorker }}
+    
+            reqMonitor = {{ .Values.config.relay.numThreads.reqMonitor }}
+    
+            yesstr = {{ .Values.config.relay.numThreads.yesstr }}
+        }
+    }
+    
+    events {
+        # Maximum size of normalised JSON, in bytes
+        maxEventSize = {{ .Values.config.relay.events.maxEventSize }}
+    
+        # Events newer than this will be rejected
+        rejectEventsNewerThanSeconds = {{ .Values.config.relay.events.rejectEventsNewerThanSeconds }}
+    
+        # Events older than this will be rejected
+        rejectEventsOlderThanSeconds = {{ .Values.config.relay.events.rejectEventsOlderThanSeconds }}
+    
+        # Ephemeral events older than this will be rejected
+        rejectEphemeralEventsOlderThanSeconds = {{ .Values.config.relay.events.rejectEphemeralEventsOlderThanSeconds }}
+    
+        # Ephemeral events will be deleted from the DB when older than this
+        ephemeralEventsLifetimeSeconds = {{ .Values.config.relay.events.ephemeralEventsLifetimeSeconds }}
+    
+        # Maximum number of tags allowed
+        maxNumTags = {{ .Values.config.relay.events.maxNumTags }}
+    
+        # Maximum size for tag values, in bytes
+        maxTagValSize = {{ .Values.config.relay.events.maxTagValSize }}
+    }

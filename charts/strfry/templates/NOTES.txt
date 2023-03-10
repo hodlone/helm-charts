@@ -1,0 +1,25 @@
+=====================================================================================
+ _____  _____ ______ ______ ______ __   __  _____  _____ ______  _   _  _____ ______ 
+/  ___||_   _|| ___ \|  ___|| ___ \\ \ / / /  ___||  ___|| ___ \| | | ||  ___|| ___ \
+\ `--.   | |  | |_/ /| |_   | |_/ / \ V /  \ `--. | |__  | |_/ /| | | || |__  | |_/ /
+ `--. \  | |  |    / |  _|  |    /   \ /    `--. \|  __| |    / | | | ||  __| |    / 
+/\__/ /  | |  | |\ \ | |    | |\ \   | |   /\__/ /| |___ | |\ \ \ \_/ /| |___ | |\ \ 
+\____/   \_/  \_| \_|\_|    \_| \_|  \_/   \____/ \____/ \_| \_| \___/ \____/ \_| \_|
+ 
+=====================================================================================
+
+{{ if .Values.ingress.enabled }}
+Success! Strfry has been deployed. your relay is exposed at:
+{{- range .Values.ingress.hosts }}
+  - "wss://{{ .host }}:{{ $.Values.service.port }}"
+{{- end }}
+{{ else }}
+Success! Strfry has been deployed. your relay is exposed at: wss://{{ include "strfry.headlessServiceName" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+{{ end }}
+--------------------------------------------------------------------------
+contact:
+{{- range $.Chart.Maintainers }}
+  - name: {{ .Name }}
+    email: {{ .Email }}
+    url: {{ .URL }}
+{{- end }}

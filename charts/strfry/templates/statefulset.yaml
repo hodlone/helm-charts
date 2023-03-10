@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "strfry.name" . }}
+  labels: {{ include "strfry.labels" . | nindent 4 }}
+  annotations: {{ toYaml .Values.statefulSet.annotations | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "strfry.selectorLabels" . | nindent 6 }}
+
+  serviceName: {{ include "strfry.headlessServiceName" . }}
+  
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      labels:
+        {{- include "strfry.selectorLabels" . | nindent 8 }} 
+        
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 180 }}
+
+      {{- if .Values.securityContext.enabled }}
+      # security context
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      {{- end }}
+
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+
+      containers:
+      - name: {{ include "strfry.name" . }}
+        image: {{ include "strfry.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+        resources: {{- toYaml .Values.resources | nindent 12 }}
+
+      {{- if .Values.command.enabled }}
+      # Override the command and arguments passed to the process
+        command: {{ .Values.command.cmd }}
+        args: 
+          {{- range .Values.command.args }}
+          - {{ . }}
+          {{- end }}
+      {{- end }}
+
+      {{- if .Values.securityContext.enabled }}
+      # security context
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+          allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+      {{- end }}
+
+      # container ports
+        ports:
+        {{- range $.Values.statefulSet.containerPorts }}
+          - containerPort: {{ .containerPort }}
+            protocol: {{ .protocol | quote }}
+            name: {{ .name | quote }}
+        {{- end }}
+
+      {{- if .Values.probesEnabled }}
+      # liveness and readiness probes
+        startupProbe:
+          {{- toYaml .Values.startupProbe | nindent 12 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+      {{- end }}
+
+#############
+## Volumes ##
+#############
+        volumeMounts:
+          - name: config 
+            mountPath: {{ .Values.config.mountPath }}
+            subPath: {{ .Values.config.subPath }}
+        {{- if and .Values.persistence.enabled }}
+          - name: strfry-data
+            mountPath: {{ .Values.persistence.mountPath }}
+        {{- end }}
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "strfry.configMapName" . }}
+      {{- if .Values.persistence.preProvisionedDataVolume }}
+        - name: strfry-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.claimName }}
+      {{- end }}
+
+{{- if not .Values.persistence.preProvisionedDataVolume }}
+  volumeClaimTemplates:
+    - metadata:
+        name: strfry-data
+        labels: {{ include "strfry.labels" . | nindent 10 }}
+        annotations:
+          volume.beta.kubernetes.io/storage-provisioner: ebs.csi.aws.com
+          volume.kubernetes.io/selected-node: ip-10-21-9-82.us-west-2.compute.internal
+          volume.kubernetes.io/storage-provisioner: ebs.csi.aws.com
+      spec:
+        {{- if .Values.persistence.storageClass }}
+        storageClassName: {{ .Values.persistence.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.capacity }}
+        accessModes: [ ReadWriteOnce ]
+{{- end }}
