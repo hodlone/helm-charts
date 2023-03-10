@@ -72,5 +72,4 @@ jobs:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
           commit_prefix: "[CI]"
           commit_message: "Automated charts packages and index update"
-          organization_domain: "github.com/hodlone"
           target_branch: ${{ steps.extract_branch.outputs.branch }}
