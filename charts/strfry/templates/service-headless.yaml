@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "strfry.headlessServiceName" . }}
+  labels: {{ include "strfry.labels" . | nindent 4 }}
+spec:
+  clusterIP: None # Headless Service!
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.portName }}
+      protocol: TCP
+      name: {{ .Values.service.portName }}
+  selector:
+    {{- include "strfry.selectorLabels" . | nindent 4 }}

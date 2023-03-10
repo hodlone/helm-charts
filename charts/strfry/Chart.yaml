@@ -1,0 +1,14 @@
+apiVersion: v2
+name: strfry
+description: A Helm chart for running strfry relays in Kubernetes
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - nostr
+  - strfry
+sources:
+  - https://github.com/hoytech/strfry
+maintainers:
+  - name: ronaldcrb
+    email: alonzo.ronald@gmail.com
