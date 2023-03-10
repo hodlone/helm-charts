@@ -54,3 +54,17 @@ jobs:
           
       - name: Test Charts
         run: ct lint $(ct list-changed)
+
+      - name: Package Charts
+        run: make
+
+      - name: Generate new index
+        run: make index
+
+      - name: Push Generated Artifacts
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          add_timestamp: true
+          commit_prefix: "[CI]"
+          commit_message: "Automated charts packages and index update"
