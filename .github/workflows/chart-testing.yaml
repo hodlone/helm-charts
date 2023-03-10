@@ -20,6 +20,11 @@ jobs:
         with:
           fetch-depth: 0
       
+      # extract branch name for later usage
+      - name: Extract branch name
+        id: extract_branch
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
       # setup helm environment
       - name: Setup Helm v${{ env.HELM_VERSION }} Environment
         run: |
@@ -68,3 +73,4 @@ jobs:
           commit_prefix: "[CI]"
           commit_message: "Automated charts packages and index update"
           organization_domain: "github.com/hodlone"
+          target_branch: ${{ steps.extract_branch.outputs.branch }}
