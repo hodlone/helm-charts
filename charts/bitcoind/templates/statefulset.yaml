@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "bitcoind.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "bitcoind.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "bitcoind.selectorLabels" . | nindent 6 }}
+
+  serviceName: {{ include "bitcoind.serviceName" . }}
+
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      labels:
+        {{- include "bitcoind.selectorLabels" . | nindent 8 }} 
+        
+    spec:
+      # this is really important to prevent kubernetes killing the pod unexpectedly
+      # in situations where the standard 30 seconds are not enough for the process to
+      # shutdown gracefully
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 600 }}
+
+      # security context
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      {{- end }}
+
+      containers:
+        - name: {{ include "bitcoind.name" . }}
+
+          # security context
+          {{- if .Values.securityContext.enabled }}
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+          {{- end }}
+
+          image: {{ include "bitcoind.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+
+          ports:
+          {{- range $.Values.containerPorts }}
+            - containerPort: {{ .containerPort }}
+              protocol: {{ .protocol | quote }}
+              name: {{ .name | quote }}
+          {{- end }}
+
+          # to override the command (to override options for example)
+          {{- if .Values.command.enabled }}
+          command: {{ .Values.command.cmd }}
+          args: 
+            {{- range .Values.command.args }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+
+          # liveness and readiness probes
+          {{- if .Values.probesEnabled }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}          
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          # External disk mounted to the container
+          volumeMounts:
+          {{- if and .Values.dataPersistency.enabled }}
+            - mountPath: {{ .Values.dataPersistency.mountPath }}
+              name: {{ include "bitcoind.persistenVolumeName" . }}
+          {{- end }}
+            - name: bitcoin-conf
+              mountPath: "/home/bitcoin"
+              readOnly: true
+
+      volumes:
+
+      {{- if .Values.dataPersistency.enabled }}
+        - name: {{ include "bitcoind.persistenVolumeName" . }}
+          persistentVolumeClaim:
+            claimName: {{ include "bitcoind.persistenVolumeName" . }}
+      {{- end }}
+        - name: bitcoin-conf
+          configMap:
+            name: {{ template "bitcoind.fullname" . }}
+      
+      # necessary for preventing the scheduling of pods in nodes that dont have enough storage
+      {{- if .Values.nodeSelectorEnabled }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

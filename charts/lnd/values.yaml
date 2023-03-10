@@ -1,0 +1,107 @@
+image:
+  name: "lightninglabs/lndinit"
+  tag: "v0.1.5-beta-lnd-v0.15.3-beta"
+  pullPolicy: IfNotPresent  # Always
+
+replicaCount: 1
+
+# select a specific worker node of the kubernetes cluster
+nodeSelectorEnabled: false
+nodeSelector:
+  preemptible: "false"
+
+resources: {}
+
+# setup environment variables (key:value)
+env: {}
+
+# stablish what user and what privileges are used to run the bitcoin process
+securityContext:
+  enabled: false
+  runAsUser: 100
+  readOnlyFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  type: "ClusterIP"
+  clusterIp: "None"  # set to "None" for headless service configuration
+  ports:
+    - port: 9735
+      targetPort: 9735
+      protocol: TCP
+      name: p2p-mainnet
+    - port: 10009
+      targetPort: 10009
+      protocol: TCP
+      name: rpc
+
+# these are the ports opened in the container
+containerPorts:
+  - containerPort: 9735
+    protocol: TCP
+    name: p2p-mainnet
+  - containerPort: 10009
+    protocol: TCP
+    name: rpc
+
+# here you define the options for the node similarly to what you would do in the
+# command line
+command:
+  enabled: true
+  cmd: ["lnd"]
+  args: [
+    # "--bitcoin.active",
+    # "--bitcoin.mainnet",
+    # "--debuglevel=debug",
+    # "--bitcoin.node=bitcoind",
+    # "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
+    # "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
+    # "--externalip=bitcoin-core:8332"
+  ]
+
+# name of the k8s secret containing the lnd.conf file
+configSecret: ""
+# literal configuration writtenn as yaml multiline |-
+configFile:
+  lnd.conf: |-
+    ;debuglevel=info
+
+# name of the secret managed by lndinit where wallet credentials are allocated
+walletPasswordSecret: placeholder
+
+# use a generous grace period to aid with propper shutdowns.
+terminationGracePeriodSeconds: 300
+probesEnabled: false
+livenessProbe:
+  exec:
+    command:
+      - lncli
+      - state
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+readinessProbe:
+  exec:
+    command:
+      - lncli
+      - state
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+dataPersistency:
+  enabled: false
+  storageClass: lnd-data
+  volumeMode: "Filesystem"
+  mountPath: /root/.lnd
+  capacity: "10Gi"
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  # a block containing the provider configuration (`hostPath` for minikube and `gcePersistentDisk` for GCP )
+  providerPvConfig: {}

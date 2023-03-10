@@ -1,8 +1,0 @@
-{{- if and .Values.dataPersistency.enabled }}
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: {{ .Values.dataPersistency.storageClass }}
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
-{{- end }}

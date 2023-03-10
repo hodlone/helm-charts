@@ -1,0 +1,48 @@
+name: "Chart Testing" 
+
+on:
+  push:
+    branches:
+      - refactoring
+
+jobs:
+  helm:
+    runs-on: "ubuntu-latest"
+
+    env:
+      HELM_VERSION: "3.11.2"
+      HELM_CR_VERSION: "1.5.0"
+
+    steps:
+      # checkout the code (git clone with fetch-depth=0... use 1 to fetch only the HEAD reference)
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      # setup helm environment
+      - name: Setup Helm v${{ env.HELM_VERSION }} Environment
+        run: |
+          set -o errexit
+          echo '=====> Setting up HELM'
+          wget -q https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          tar -zxf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          rm -rf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz         
+          rm -rf linux-amd64
+      
+      - name: Package Charts
+        run: make
+
+      - name: Generate new index
+        run: make index
+
+      - name: Push Generated Artifacts
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          add_timestamp: true
+          commit_prefix: "[CI]"
+          commit_message: "Automated charts packages and index update"
+          force: false
+          target_branch: master

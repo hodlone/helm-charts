@@ -1,0 +1,29 @@
+{{- if and .Values.dataPersistency.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "lnd.persistenVolumeName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "lnd.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.dataPersistency.capacity }}
+
+  volumeMode: {{ .Values.dataPersistency.volumeMode }}
+
+  accessModes:
+    {{- range $.Values.dataPersistency.accessModes }}
+    - {{ . }}
+    {{- end }}
+
+  persistentVolumeReclaimPolicy: {{ .Values.dataPersistency.persistentVolumeReclaimPolicy }}
+
+  storageClassName: {{ .Values.dataPersistency.storageClass }}
+
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ include "lnd.persistenVolumeName" . }}
+
+  {{- toYaml .Values.dataPersistency.providerPvConfig | nindent 2 }}
+{{- end }}
