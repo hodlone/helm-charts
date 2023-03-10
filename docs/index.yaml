@@ -3,9 +3,9 @@ entries:
   bitcoind:
   - apiVersion: v2
     appVersion: 0.23.0
-    created: "2023-03-10T22:32:44.895538796Z"
+    created: "2023-03-10T22:43:32.020060077Z"
     description: A Helm Chart for Bitcoin Core
-    digest: e3404a76cd3ce5af5cd0e6c73ec5dbf81639824e4ab76c8173ce5076df935ece
+    digest: 50cdc8d4a92e1b8caf94b0902b5c596d54b0b69f2d1070b4aa148cdc3b6f54d8
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -19,9 +19,9 @@ entries:
   c-lightning:
   - apiVersion: v2
     appVersion: 0.10.0
-    created: "2023-03-10T22:32:44.896135198Z"
+    created: "2023-03-10T22:43:32.020610575Z"
     description: A Helm chart for the c-lightning client
-    digest: 0c6e16e83f4868b200c7e99889accc10cf4a8bd4d2394e204a2466e126a4a281
+    digest: 9a8005e643ad6a20984fd233764376e59c093c980fbb07a46df24ec1d6aa8c52
     maintainers:
     - email: alonzoricardo6@gmail.com
       name: Rick Alonzo
@@ -35,9 +35,9 @@ entries:
   lnd:
   - apiVersion: v2
     appVersion: 0.15.0
-    created: "2023-03-10T22:32:44.896705399Z"
+    created: "2023-03-10T22:43:32.021184274Z"
     description: A Helm Chart for Lightning Network Daemon
-    digest: 7ec19fc47bd24a8926dbde7ab3232689194145a942723240eca5144212f5f267
+    digest: 4804cf47daefa2577112664db75b65fb644b5b2385cfc805b38bfe11639e109c
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -51,9 +51,9 @@ entries:
   strfry:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-03-10T22:32:44.897475601Z"
+    created: "2023-03-10T22:43:32.021945972Z"
     description: A Helm chart for running strfry relays in Kubernetes
-    digest: bd06944737b90247c4001b8e7fa1afd59b8e2d1c62ed0abcca336d5ec991ac66
+    digest: 4be23462f9b08108d2b4b1dc562fb8567d0cd53116939a65dcfd443642c8d80e
     keywords:
     - nostr
     - strfry
@@ -67,4 +67,4 @@ entries:
     urls:
     - https://hodlone.github.io/helm-charts/docs/strfry-0.1.1.tgz
     version: 0.1.1
-generated: "2023-03-10T22:32:44.893895192Z"
+generated: "2023-03-10T22:43:32.019184279Z"
