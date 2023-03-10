@@ -1,25 +1,31 @@
-###################################################################################
-##################################### REPLICAS ####################################
-###################################################################################
+image:
+  name: "lightninglabs/lndinit"
+  tag: "v0.1.5-beta-lnd-v0.15.3-beta"
+  pullPolicy: IfNotPresent  # Always
+
 replicaCount: 1
 
-###################################################################################
-####################################### IMAGE #####################################
-###################################################################################
-image:
-  name: "gcr.io/nodehodl/lnd"
-  tag: alpine
-  #pullPolicy: IfNotPresent # Always
+# select a specific worker node of the kubernetes cluster
+nodeSelectorEnabled: false
+nodeSelector:
+  preemptible: "false"
 
+resources: {}
 
-###################################################################################
-##################################### SERVICE #####################################
-###################################################################################
+# setup environment variables (key:value)
+env: {}
+
+# stablish what user and what privileges are used to run the bitcoin process
+securityContext:
+  enabled: false
+  runAsUser: 100
+  readOnlyFilesystem: false
+  allowPrivilegeEscalation: false
+
 service:
-  #nameOverride: "dummy-service"
-  type: "ClusterIP" 
-  clusterIp: "None" # set to "None" for headless service configuration
-  ports: 
+  type: "ClusterIP"
+  clusterIp: "None"  # set to "None" for headless service configuration
+  ports:
     - port: 9735
       targetPort: 9735
       protocol: TCP
@@ -29,9 +35,6 @@ service:
       protocol: TCP
       name: rpc
 
-###################################################################################
-################################## container ports ################################
-###################################################################################
 # these are the ports opened in the container
 containerPorts:
   - containerPort: 9735
@@ -41,67 +44,40 @@ containerPorts:
     protocol: TCP
     name: rpc
 
-###################################################################################
-################################## NODE SELECTOR ##################################
-###################################################################################
-# select a specific worker node of the kubernetes cluster  
-nodeSelectorEnabled: false
-nodeSelector:
-  preemptible: "false"
-
-###################################################################################
-################################# SECURITY CONTEXT ################################
-###################################################################################
-# stablish what user and what privileges are used to run the bitcoin process
-securityContext:
-  enabled: false
-  runAsUser: 100
-  allowPrivilegeEscalation: false
-
-###################################################################################
-###################################### COMMAND ####################################
-###################################################################################
-# here you define the options for the node similarly to what you would do in the 
-# command line; 
-# lnd requires the RPC credentials and host; it also needs addresses of the ZMQ 
-# interfaces of bitcoin-core node
-
-command: 
+# here you define the options for the node similarly to what you would do in the
+# command line
+command:
   enabled: true
-
+  cmd: ["lnd"]
   args: [
-    "--bitcoin.active",
-    "--bitcoin.mainnet",
-    "--debuglevel=debug",
-    "--bitcoin.node=bitcoind",
-    "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
-    "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
-    "--externalip=bitcoin-core:8332"
+    # "--bitcoin.active",
+    # "--bitcoin.mainnet",
+    # "--debuglevel=debug",
+    # "--bitcoin.node=bitcoind",
+    # "--bitcoind.zmqpubrawblock=tcp://bitcoin-core:28332",
+    # "--bitcoind.zmqpubrawtx=tcp://bitcoin-core:28333",
+    # "--externalip=bitcoin-core:8332"
   ]
 
-###################################################################################
-##################################### RESOURCES ###################################
-###################################################################################
-resources:
-  requests:
-    memory: "1Gi"
-    cpu: "0.1"
-  limits:
-    memory: "2Gi"
-    cpu: "0.6"
+# name of the k8s secret containing the lnd.conf file
+configSecret: ""
+# literal configuration writtenn as yaml multiline |-
+configFile:
+  lnd.conf: |-
+    ;debuglevel=info
 
-###################################################################################
-##################################### PROBES ######################################
-###################################################################################
-# use a generous grace period to aid with propper shutdowns. 
+# name of the secret managed by lndinit where wallet credentials are allocated
+walletPasswordSecret: placeholder
+
+# use a generous grace period to aid with propper shutdowns.
 terminationGracePeriodSeconds: 300
-probesEnabled: true
+probesEnabled: false
 livenessProbe:
   exec:
     command:
       - lncli
       - state
-  initialDelaySeconds: 10 
+  initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 5
@@ -118,19 +94,14 @@ readinessProbe:
   failureThreshold: 5
   successThreshold: 1
 
-
-###################################################################################
-################################ DATA PERSISTENCY #################################
-###################################################################################
 dataPersistency:
   enabled: false
   storageClass: lnd-data
   volumeMode: "Filesystem"
-  mountPath: /home/root/.lnd
-  capacity: "5Gi"
-  accessModes: 
-    - ReadWriteOnce
+  mountPath: /root/.lnd
+  capacity: "10Gi"
+  accessModes:
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  
-  # a block containing the provider configuration for the persistent disks
-  #providerPvConfig: {}
+  # a block containing the provider configuration (`hostPath` for minikube and `gcePersistentDisk` for GCP )
+  providerPvConfig: {}

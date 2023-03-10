@@ -22,11 +22,6 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/* ########### Service Name ########### */}}
-{{- define "lnd.serviceName" -}}
-{{- default .Chart.Name .Values.service.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{/* ########### Selector labels ########### */}}
 {{- define "lnd.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "lnd.name" . }}
@@ -52,11 +47,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 {{- end -}}
 
-{{/* ########### Create the full name for the persistent volume ########### */}}
 {{- define "lnd.persistenVolumeName" -}}
-{{- if .Values.dataPersistency.testMode -}}
-"{{ include "lnd.name" . }}-data-test"
-{{- else -}}
-"{{ include "lnd.name" . }}-data"
-{{- end -}}
+"{{ include "lnd.name" . }}-{{ .Values.dataPersistency.storageClass }}"
 {{- end -}}

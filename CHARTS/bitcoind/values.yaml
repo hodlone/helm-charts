@@ -1,0 +1,139 @@
+image:
+  name: "ruimarinho/bitcoin-core"
+  tag: "latest"
+  pullPolicy: IfNotPresent  # Always
+
+replicaCount: 1
+
+# select a stable worker node of the kubernetes cluster to avoid syncing issues
+nodeSelectorEnabled: false
+nodeSelector:
+  preemptible: "false"
+
+# when using a cloud provided disk with limited input/output capacity, errors and
+# syncing problems may occur. in that situation, one can tweak the CPU and memory
+# to limit the I/O load capacity of the node. once fully synced it is ok to crank
+# these resources up to serve more requests per second.
+# these defaults are a good starting point for a cloud provided standard disk
+# Running the numbers usually takes 5 min with these values
+resources: {}
+
+# stablish what user and what privileges are used to run the bitcoin process
+securityContext:
+  enabled: false
+  runAsUser: 100
+  allowPrivilegeEscalation: false
+
+service:
+  type: "ClusterIP"
+  clusterIp: "None"  # set to "None" for headless service configuration
+  ports:
+    - port: 8332
+      targetPort: 8332
+      protocol: TCP
+      name: rpc-mainnet
+    - port: 28332
+      targetPort: 28332
+      protocol: TCP
+      name: zmq-rawblock
+    - port: 28333
+      targetPort: 28333
+      protocol: TCP
+      name: zmq-rawtax
+    - port: 28334
+      targetPort: 28334
+      protocol: TCP
+      name: zmq-hashblock
+    - port: 28335
+      targetPort: 28335
+      protocol: TCP
+      name: zmq-hashtx
+
+# these are the ports opened in the container
+containerPorts:
+  - containerPort: 8332
+    protocol: TCP
+    name: rpc-mainnet
+  - containerPort: 28332
+    protocol: TCP
+    name: zmq-rawblock
+  - containerPort: 28333
+    protocol: TCP
+    name: zmq-rawtax
+  - containerPort: 28334
+    protocol: TCP
+    name: zmq-hashblock
+  - containerPort: 28335
+    protocol: TCP
+    name: zmq-hashtx
+
+# here you define the options for the node similarly to what you would do in the
+# command line or the bitcoin.conf file;
+# -regtest=1 is the default
+command:
+  enabled: true
+  cmd: ["bitcoind"]
+  args: [
+    ## we can override the bitcoin.conf file with these parameters
+    # "-regtest=1",
+    # "-txindex=1",
+    # "-server=1",
+    # "-blockfilterindex=1",
+    # "-rpcbind=0.0.0.0",
+    # "-rpcport=18444",
+    # "-zmqpubrawblock=tcp://0.0.0.0:28332",
+    # "-zmqpubrawtx=tcp://0.0.0.0:28333",
+    # "-rpcallowip=0.0.0.0/0",
+  ]
+
+# use a generous grace period to avoid long resyncs (rolling forward) at restart
+# when the node receives SIGINT directive from kubernetes, it initiates a propper
+# shutdown process that takes time... 300 seconds seems to be enough time.
+terminationGracePeriodSeconds: 600
+probesEnabled: false
+livenessProbe:
+  exec:
+    command:
+      - bitcoin-cli
+      - getblockcount
+  # use generous initial delay. if the node was NOT propperly shutdown before,
+  # the resync (rolling forward) will last for several hours before it is complete...
+  # during this time, all CLI commands will fail and kubernetes will kill the pod
+  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+  initialDelaySeconds: 600
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+readinessProbe:
+  exec:
+    command:
+      - bitcoin-cli
+      - getblockcount
+  # use generous initial delay. if the node was NOT propperly shutdown before,
+  # the resync (rolling forward) will last for several hours before it is complete...
+  # during this time, all CLI commands will fail and kubernetes will kill the pod
+  # and cause it to crashloop. 300 seconds seems to be enough in normal conditions
+  initialDelaySeconds: 600
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+configfile:
+  bitcoin.conf: |-
+    # rpcuser=rpcuser
+    # rpcpassword=rpcpassword
+
+dataPersistency:
+  enabled: false
+  storageClass: bitcoin-data
+  volumeMode: "Filesystem"
+  mountPath: /home/bitcoin/.bitcoin
+  capacity: "1Gi"
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  # a block containing the provider configuration for the persistent disks
+  providerPvConfig: {}

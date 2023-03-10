@@ -2,15 +2,19 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: {{ include "bitcoind.persistenVolumeName" . }}
   namespace: {{ .Values.namespace }}
-  name: {{ include "bitcoin-core.persistenVolumeName" . }}
+  labels:
+    {{- include "bitcoind.labels" . | nindent 4 }}
 spec:
-  storageClassName: {{ .Values.dataPersistency.storageClass }}
   accessModes:
     {{- range $.Values.dataPersistency.accessModes }}
     - {{ . }}
     {{- end }}
+
   resources:
     requests:
-      storage: {{ .Values.dataPersistency.capacity }}
+      storage: {{ .Values.dataPersistency.capacity }}    
+
+  storageClassName: {{ .Values.dataPersistency.storageClass }}
 {{- end }}

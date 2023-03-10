@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "bitcoin-core.serviceName" . }}
+  name: {{ include "bitcoind.serviceName" . }}
   namespace: {{ .Values.namespace }}
   labels:
-    {{- include "bitcoin-core.labels" . | nindent 4 }}
+    {{- include "bitcoind.labels" . | nindent 4 }}
 spec:
   selector:
-    {{- include "bitcoin-core.selectorLabels" . | nindent 4 }}
+    {{- include "bitcoind.selectorLabels" . | nindent 4 }}
 
   type: {{ .Values.service.type }}
-  clusterIP: {{ .Values.service.clusterIp }}
+
   ports:
     {{- range $.Values.service.ports }}
     - port: {{ .port }}
@@ -19,3 +19,4 @@ spec:
       name: {{ .name | quote }}
     {{- end }}
 
+  clusterIP: {{ .Values.service.clusterIp }}
