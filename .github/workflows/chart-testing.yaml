@@ -68,3 +68,4 @@ jobs:
           add_timestamp: true
           commit_prefix: "[CI]"
           commit_message: "Automated charts packages and index update"
+          organization_domain: "github.com/hodlone"
