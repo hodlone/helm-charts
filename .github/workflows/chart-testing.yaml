@@ -42,7 +42,7 @@ jobs:
 
           echo '=====> Installing ct (chart-testing)'
           wget -q https://github.com/helm/chart-testing/releases/download/v${{ env.HELM_CT_VERSION }}/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz -P /tmp
-          tar -zxf tmp/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz -C /tmp
+          tar -zxf /tmp/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz -C /tmp
           sudo mv /tmp/ct /usr/local/bin/ct
           mkdir ~/.ct
           mv /tmp/etc/*.yaml ~/.ct/
