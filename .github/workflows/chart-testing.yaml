@@ -27,6 +27,7 @@ jobs:
           echo '=====> Setting up HELM'
           wget -q https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz -P tmp
           tar -zxf tmp/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          ls -al tmp
           sudo mv tmp/linux-amd64/helm /usr/local/bin/helm
           rm -rf tmp 
       
