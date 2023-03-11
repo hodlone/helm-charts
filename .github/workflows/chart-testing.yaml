@@ -71,4 +71,4 @@ jobs:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
           commit_prefix: "[CI]"
           commit_message: "Automated charts packages and index update"
-          target_branch: ${{ github.head_ref_name }}
+          target_branch: ${{ github.ref_name }}
