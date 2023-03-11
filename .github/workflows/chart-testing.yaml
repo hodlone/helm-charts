@@ -25,11 +25,10 @@ jobs:
         run: |
           set -o errexit
           echo '=====> Setting up HELM'
-          wget -q https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
-          tar -zxf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
-          sudo mv linux-amd64/helm /usr/local/bin/helm
-          rm -rf helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz         
-          rm -rf linux-amd64
+          wget -q https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz -P tmp
+          tar -zxf tmp/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz
+          sudo mv tmp/linux-amd64/helm /usr/local/bin/helm
+          rm -rf tmp 
       
       # setup helm chart-testing environment and its dependencies
       - name: Setup Chart-Testing v${{ env.HELM_CT_VERSION }} Environment
@@ -37,20 +36,18 @@ jobs:
           echo '=====> Installing yamllint'
           sudo apt install yamllint  
           echo '=====> Installing yamale'
-          wget -q https://github.com/23andMe/Yamale/archive/master.zip
-          unzip master.zip
-          rm -rf master.zip
-          ls -al Yamale-master
-          cd Yamale-master
-          sudo python3 setup.py install
-          cd ..
-          sudo rm -rf Yamale-master
+          wget -q https://github.com/23andMe/Yamale/archive/master.zip -P tmp
+          unzip tmp/master.zip
+          sudo python3 tmp/Yamale-master/setup.py install
+          rm -rf tmp
+
           echo '=====> Installing ct (chart-testing)'
-          wget -q https://github.com/helm/chart-testing/releases/download/v${{ env.HELM_CT_VERSION }}/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz
-          tar -zxf chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz
-          sudo mv ct /usr/local/bin/ct
+          wget -q https://github.com/helm/chart-testing/releases/download/v${{ env.HELM_CT_VERSION }}/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz -P tmp
+          tar -zxf tmp/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz
+          sudo mv tmp/ct /usr/local/bin/ct
           mkdir ~/.ct
-          mv etc/*.yaml ~/.ct/
+          mv tmp/etc/*.yaml ~/.ct/
+          rm -rf tmp
       
       # Test the charts that have changed (compared to master branch)
       - name: Test Charts
@@ -69,6 +66,6 @@ jobs:
         uses: devops-infra/action-commit-push@master
         with:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
-          commit_prefix: "[CI]"
+          commit_prefix: "[CI] "
           commit_message: "Automated charts packages and index update"
           target_branch: ${{ github.head_ref }}
