@@ -23,7 +23,6 @@ jobs:
       # setup helm environment
       - name: Setup Helm v${{ env.HELM_VERSION }} Environment
         run: |
-          set -o errexit
           echo '=====> Setting up HELM'
           wget -q https://get.helm.sh/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz -P /tmp
           tar -zxf /tmp/helm-v${{ env.HELM_VERSION }}-linux-amd64.tar.gz -C /tmp 
@@ -34,10 +33,12 @@ jobs:
         run: |
           echo '=====> Installing yamllint'
           sudo apt install yamllint  
+          
           echo '=====> Installing yamale'
           wget -q https://github.com/23andMe/Yamale/archive/master.zip -P /tmp
           unzip /tmp/master.zip -d /tmp
-          sudo python3 /tmp/Yamale-master/setup.py install
+          cd /tmp/Yamale-master
+          sudo python3 setup.py install
 
           echo '=====> Installing ct (chart-testing)'
           wget -q https://github.com/helm/chart-testing/releases/download/v${{ env.HELM_CT_VERSION }}/chart-testing_${{ env.HELM_CT_VERSION }}_linux_amd64.tar.gz -P /tmp
