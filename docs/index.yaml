@@ -3,9 +3,9 @@ entries:
   bitcoind:
   - apiVersion: v2
     appVersion: 0.23.0
-    created: "2023-03-10T23:03:26.657960074Z"
+    created: "2023-03-11T17:43:55.487644832Z"
     description: A Helm Chart for Bitcoin Core
-    digest: 4f9eb265c0875e6dc617248e94355601eb149bc0d49ded1a239c506734237740
+    digest: 3c6d954a507fa9644f0da0356fad353933fd939265aa10ff54fabf173f2b5c29
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -19,9 +19,9 @@ entries:
   c-lightning:
   - apiVersion: v2
     appVersion: 0.10.0
-    created: "2023-03-10T23:03:26.658513771Z"
+    created: "2023-03-11T17:43:55.488371436Z"
     description: A Helm chart for the c-lightning client
-    digest: e62b8de3599dc32132b8ab5d802564fb16fb33560315a5b6624f9f21d6e0c8a4
+    digest: 56f4058d5c075ed05547fbbab614dd784246d90401826ad03681b5d30f405544
     maintainers:
     - email: alonzoricardo6@gmail.com
       name: Rick Alonzo
@@ -35,9 +35,9 @@ entries:
   lnd:
   - apiVersion: v2
     appVersion: 0.15.0
-    created: "2023-03-10T23:03:26.659083767Z"
+    created: "2023-03-11T17:43:55.489255542Z"
     description: A Helm Chart for Lightning Network Daemon
-    digest: df6cb96e8209c211f9422c26109c0e005f65ba86ca0fec869064e75c29e429b4
+    digest: ac383bf2b6700ae2d337729e3316c56bf22d90b0b31f1a72e53e1e4f4777e16c
     maintainers:
     - email: MassimilianoDH95@gmail.com
       name: MassimilianoDH
@@ -51,9 +51,9 @@ entries:
   strfry:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-03-10T23:03:26.660651257Z"
+    created: "2023-03-11T17:43:55.491181655Z"
     description: A Helm chart for running strfry relays in Kubernetes
-    digest: 5bf29e46cdc3cc968dc824a602d3df1892826e915729fbe432ff41fcb7fa7050
+    digest: 05f0525eb338412f36782b7ad863a3de5e65fbff90a638fb290ba84643de2e12
     keywords:
     - nostr
     - strfry
@@ -69,7 +69,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-03-10T23:03:26.659856262Z"
+    created: "2023-03-11T17:43:55.490190248Z"
     description: A Helm chart for running strfry relays in Kubernetes
     digest: 4be23462f9b08108d2b4b1dc562fb8567d0cd53116939a65dcfd443642c8d80e
     keywords:
@@ -85,4 +85,4 @@ entries:
     urls:
     - https://hodlone.github.io/helm-charts/docs/strfry-0.1.1.tgz
     version: 0.1.1
-generated: "2023-03-10T23:03:26.65712378Z"
+generated: "2023-03-11T17:43:55.486659425Z"
